@@ -36,12 +36,12 @@ typedef std::list<Blade> blades_t;
          _blades.push_back(b);
       }
 
-      Mvec(double v) : Mvec(Blade(v)) {
-
+      Mvec(double v) {
+         _blades.push_back(Blade(v));
       }
 
-      Mvec(double v, unsigned long e) : Mvec(Blade(v, e)) {
-
+      Mvec(double v, unsigned long e) {
+         _blades.push_back(Blade(v,e));
       }
 
       Mvec(const blades_t& blades) {

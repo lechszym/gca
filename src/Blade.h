@@ -31,8 +31,9 @@ public:
       _v = v;
    }
 
-   Blade(const Blade& orig) : Blade(orig._v, orig._e) {
-
+   Blade(const Blade& orig) {
+      _v = orig._v;
+      _e = orig._e;
    }
 
    virtual ~Blade() {
