@@ -44,23 +44,40 @@ mxMvec::mxMvec(double *v,size_t length) {
 
 mxMvec::mxMvec(const mxArray *a) {
 
-    
-    /*mxArray *m = mxGetProperty(mvec,0,"gcamdata");
-    if(!m) {
-       mexErrMsgTxt("mvec format invalid!"); 
-    }
-    
-    mwSize nblades = mxGetNumberOfElements(m);     
-
-    for(unsigned int i=0;i<nblades;i++) {
-        mxArray *bmx = mxGetCell(m,i);
-        
-        if(!bmx) {
-            mexErrMsgTxt("Failed to read mvec cell");
+    if(mxIsClass(a,"mvec")) {
+        mxArray *m = mxGetProperty(a,0,"gcamdata");
+        if(!m) {
+           mexErrMsgTxt("mvec format invalid!"); 
         }
-        mxBlade b(bmx);
-        this->blades.push_back(b);
-    } */   
+
+        mwSize nblades = mxGetNumberOfElements(m);     
+
+        for(unsigned int i=0;i<nblades;i++) {
+            mxArray *bmx = mxGetCell(m,i);
+            
+            if(!bmx) {
+                mexErrMsgTxt("Failed to read mvec cell");
+            }
+            //Blade b(bmx);
+            _blades.push_back(mxArray2Blade(bmx));
+        }
+    } else {
+        size_t N = mxGetN(a);
+        size_t M = mxGetM(a);
+        
+        if( (N!=1) && (M!=1) ) {
+            mexErrMsgTxt("mvec can be initialised with a vector");
+        }
+        
+        size_t L = N*M;
+           
+        double *v = mxGetPr(a);        
+        
+        for(size_t l=0;l<L;l++) {
+            _blades.push_back(Blade(*v++,l+1));        
+        }
+        this->prune();
+    }
 }
 
 mxMvec::mxMvec(const Mvec& orig) : Mvec(orig) {
@@ -70,9 +87,9 @@ mxMvec::mxMvec(const Mvec& orig) : Mvec(orig) {
 //::~mxMvec() {
 //}
 
-mxArray *mxMvec::matConvert(const Blade &b) {
+mxArray *mxMvec::Blade2mxArray(const Blade &b) {
 
-    const char *BfieldNames[] = {"dim", "v", "e"};
+    const char *BfieldNames[] = {"grade", "v", "e"};
     mwSize Bdims[2] = {1, 1};
     mxArray *smxB = mxCreateStructArray(2, Bdims, 3, BfieldNames);
     if (!smxB) {
@@ -82,7 +99,7 @@ mxArray *mxMvec::matConvert(const Blade &b) {
     unsigned int grade = b.grade();
     
     //Set the dim
-    int fieldN = mxGetFieldNumber(smxB, "dim");
+    int fieldN = mxGetFieldNumber(smxB, "grade");
     mxSetFieldByNumber(smxB, 0, fieldN, mxCreateDoubleScalar(grade));
 
     //Set the v
@@ -104,8 +121,37 @@ mxArray *mxMvec::matConvert(const Blade &b) {
     return smxB;
 }
 
+Blade& mxMvec::mxArray2Blade(const mxArray *B) {
+    mxArray *mxA = mxGetField(B, 0, "grade");
+    if (!mxA || !mxIsClass(mxA,"double")) {
+        mexErrMsgTxt("Failed to read field 'grade'!");
+    }
+    double *data_ptr = mxGetPr(mxA);
+    unsigned int grade = (unsigned int) (*data_ptr);
 
-mxArray *mxMvec::matConvert(void) {
+    mxA = mxGetField(B, 0, "v");
+    if (!mxA || !mxIsClass(mxA,"double")) {
+        mexErrMsgTxt("Failed to read field 'v'!");
+    }
+    data_ptr = mxGetPr(mxA);
+    double v = *data_ptr;
+    
+    mxA = mxGetField(B, 0, "e");
+    if (!mxA || !mxIsClass(mxA,"uint32")) {
+        mexErrMsgTxt("Failed to read field 'e'!");
+    }
+    unsigned int *e_p = (unsigned int *) mxGetData(mxA);
+    
+    std::vector<unsigned long> e;
+    
+    for(std::size_t i=0;i<grade;i++) {
+        e.push_back(*e_p++);
+    }
+
+    return *(new Blade(v,e));
+}
+
+mxArray *mxMvec::convert2mxArray(void) {
     //mwSize cellDims[2] = {1, this->blades.size()};
     mxArray *cmxM = mxCreateCellMatrix(1, this->_blades.size());
     
@@ -118,7 +164,7 @@ mxArray *mxMvec::matConvert(void) {
     mwIndex cindx=0;
     
     for(i=_blades.begin();i!=_blades.end();i++) {
-        mxSetCell(cmxM,cindx++,this->matConvert(*i));
+        mxSetCell(cmxM,cindx++,this->Blade2mxArray(*i));
     }
     return cmxM;
 }

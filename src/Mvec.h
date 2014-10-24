@@ -314,7 +314,7 @@ typedef std::list<Blade> blades_t;
          return out;
       }
 
-   private:
+   protected:
 
       void prune() {
          blades_t::iterator i;
@@ -358,7 +358,6 @@ typedef std::list<Blade> blades_t;
          }
       }
 
-   protected:
       blades_t _blades;
 
    };

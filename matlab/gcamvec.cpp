@@ -27,7 +27,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
            }
 
            mxMvec m(prhs[1]);
-           plhs[0] = m.matConvert();
+           plhs[0] = m.convert2mxArray();
            break;
        
        }       
@@ -45,7 +45,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
            double *grade = mxGetPr(prhs[2]);
            
            mxMvec b = a[(unsigned int) (*grade)];
-           plhs[0] = b.matConvert();
+           plhs[0] = b.convert2mxArray();
            break;
        }
        
@@ -85,7 +85,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
                 break;
            }
            
-           plhs[0] = c.matConvert();         
+           plhs[0] = c.convert2mxArray();         
            break;
        }
 
@@ -101,7 +101,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
            
            mxMvec a(prhs[1]);
            mxMvec b = ~a;
-           plhs[0] = b.matConvert();         
+           plhs[0] = b.convert2mxArray();         
            break;
        }       
        

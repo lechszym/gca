@@ -18,12 +18,12 @@ public:
     //mxMvec(double *v,size_t length);
     mxMvec(const mxArray *m);
     mxMvec(const Mvec& orig);
-    mxArray* matConvert(void);
+    mxArray* convert2mxArray(void);
     mxArray* matVec(unsigned int dim);         
 
 private:
-    mxArray* matConvert(const gca::Blade &b);
-   
+    static mxArray* Blade2mxArray(const gca::Blade &b);
+    static gca::Blade&   mxArray2Blade(const mxArray *mxb);
     
 };
 
