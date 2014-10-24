@@ -101,7 +101,11 @@ classdef mvec < handle
              
       function c = scalar(a)
         c = mvec(gcamvec('g',a,0));
-        c = c.gcamdata{1}.v;
+        if(isempty(c.gcamdata))
+            c = 0;
+        else
+            c = c.gcamdata{1}.v;
+        end
       end
       
       %function c = maxGrade(m)

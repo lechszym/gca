@@ -11,36 +11,7 @@ using namespace gca;
 
 mxMvec::mxMvec() : Mvec() {
 
-}
-
-/*mxMvec::mxMvec(const char *eStr,unsigned int dim) {
-    unsigned int i=0;
-    bool beg=true;
-    
-    while(i<strlen(eStr)) {
-        while(eStr[i]==' ') {
-            i++;
-        }
-        if(beg || eStr[i]=='-' || eStr[i]=='+') {
-            mxBlade b(eStr+i,dim);
-            this->blades.push_back(b);
-        }
-        beg = false;
-        i++;
-    }
-    this->prune(); 
-}
-
-mxMvec::mxMvec(double *v,size_t length) {
-    for(unsigned int i=1;i<=length;i++) {
-        if(*v>GCA_PRECISION || *v<(-GCA_PRECISION)) {
-            mxBlade b(*v,i,length);
-            this->blades.push_back(b);
-        }
-        v++;
-    }
-}*/
-    
+}   
 
 mxMvec::mxMvec(const mxArray *a) {
 
@@ -58,7 +29,6 @@ mxMvec::mxMvec(const mxArray *a) {
             if(!bmx) {
                 mexErrMsgTxt("Failed to read mvec cell");
             }
-            //Blade b(bmx);
             _blades.push_back(mxArray2Blade(bmx));
         }
     } else {
@@ -72,9 +42,13 @@ mxMvec::mxMvec(const mxArray *a) {
         size_t L = N*M;
            
         double *v = mxGetPr(a);        
-        
-        for(size_t l=0;l<L;l++) {
-            _blades.push_back(Blade(*v++,l+1));        
+
+        if(L==1) {
+            _blades.push_back(Blade(*v));
+        } else {
+            for(size_t l=0;l<L;l++) {
+                _blades.push_back(Blade(*v++,l+1));        
+            }
         }
         this->prune();
     }
@@ -111,7 +85,7 @@ mxArray *mxMvec::Blade2mxArray(const Blade &b) {
         mexErrMsgTxt("Failed to allocate memory for blade during conversion.");
     }
             
-    char *ew = (char *) mxGetData(cmxE);
+    unsigned int *ew = (unsigned int *) mxGetData(cmxE);
     for(unsigned int i=0;i<grade;i++) {
         *ew++ = b[i];
     }
