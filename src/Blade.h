@@ -136,7 +136,7 @@ public:
       return *(new Blade(this->conj() / this->mag()));
    }
 
-std::string toString() const {
+   std::string toString() const {
       std::stringstream ss;
 
       ss.precision(4);
@@ -224,8 +224,12 @@ std::string toString() const {
       return false;
    }
 
-   unsigned int operator[] (const unsigned int gIndex) const {
+   unsigned int at(const unsigned int gIndex) const {
         return _e[gIndex];
+   }
+   
+   unsigned int operator[] (const unsigned int gIndex) const {
+        return this->at(gIndex);
    }
 
    friend std::ostream& operator<<(std::ostream &out, const Blade &b) {

@@ -144,22 +144,37 @@ mxArray *mxMvec::convert2mxArray(void) {
 }
 
 
+mxArray *mxMvec::matVec() {
+    blades_t::iterator i;
+    unsigned int dim = 0;
+    for(i=_blades.begin();i!=_blades.end();i++) {
+        if(i->grade()==1) {
+            unsigned int e = i->at(0);
+            if((e > 0) && (e > dim)) {
+                dim = e;
+            }
+        }
+    }
+    
+    return this->matVec(dim);
+}
+
 mxArray *mxMvec::matVec(unsigned int dim){
     mxArray *mxV = mxCreateDoubleMatrix(dim,1,mxREAL);
     if(!mxV) {
         mexErrMsgTxt("Failed to allocate memory for mx vector!");        
     }
-    /*
+
     double *v = mxGetPr(mxV);
-    std::list<Blade>::iterator i;
-    for(i=this->blades.begin();i!=this->blades.end();i++) {
+    blades_t::iterator i;
+    for(i=_blades.begin();i!=_blades.end();i++) {
         if(i->grade()==1) {
-            unsigned int e = i->eFirst();
+            unsigned int e = i->at(0);
             if((e > 0) && (e <= dim)) {
-                v[e-1] = i->getV(); 
+                v[e-1] = i->get(); 
             }
         }
-    }*/
+    }
     
     return mxV;
 }

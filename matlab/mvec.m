@@ -47,9 +47,13 @@ classdef mvec < handle
       function display(m)
         gcamvec('p',m);
       end
-
-      function c = vec(m,dim)
-         c=gcamvec('v',m,dim);
+      
+      function c = vec(m,vargin)
+         if(nargin==1)
+             c=gcamvec('v',m);
+         else
+             c=gcamvec('v',m,vargin);
+         end
       end
 
       function c = maxVal(m)

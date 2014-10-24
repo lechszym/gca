@@ -107,7 +107,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
        
        case 'v':
        {
-           if(nrhs < 3) {
+           if(nrhs < 2) {
                help();
            }
        
@@ -116,8 +116,13 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
            }
            
            mxMvec a(prhs[1]);
-           double *dim = mxGetPr(prhs[2]);
-           plhs[0] = a.matVec((unsigned int) *dim);         
+           if(nrhs > 2) {
+                double *dim = mxGetPr(prhs[2]);
+                plhs[0] = a.matVec((unsigned int) *dim);                        
+           } else {
+                plhs[0] = a.matVec();         
+           }
+           
            break;
        }  
        case 'p': {

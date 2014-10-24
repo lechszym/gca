@@ -19,6 +19,7 @@ public:
     mxMvec(const mxArray *m);
     mxMvec(const Mvec& orig);
     mxArray* convert2mxArray(void);
+    mxArray* matVec();
     mxArray* matVec(unsigned int dim);         
 
 private:
