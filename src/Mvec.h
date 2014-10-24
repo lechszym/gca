@@ -292,6 +292,23 @@ typedef std::list<Blade> blades_t;
 
       }
 
+      Mvec& operator~(void) {
+        return this->conj();
+      }
+      
+      Mvec operator[] (const unsigned int nIndex) const {
+        Mvec result;
+
+        blades_t::const_iterator i;
+        for(i=_blades.begin();i!=_blades.end();i++) {
+            if(i->grade()== nIndex) {
+                result._blades.push_back(*i);
+            }
+        }
+        return result;
+      }
+     
+
       friend std::ostream& operator<<(std::ostream &out, Mvec &v) {
          out << v.toString();
          return out;
@@ -341,7 +358,9 @@ typedef std::list<Blade> blades_t;
          }
       }
 
+   protected:
       blades_t _blades;
+
    };
 }
 

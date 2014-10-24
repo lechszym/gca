@@ -222,7 +222,9 @@ std::string toString() const {
       return false;
    }
 
-   
+   unsigned int operator[] (const unsigned int gIndex) const {
+        return _e[gIndex];
+   }
 
    friend std::ostream& operator<<(std::ostream &out, const Blade &b) {
       out << b.toString();
@@ -332,6 +334,7 @@ private:
       return *e;
    }
 
+protected:
    ebase_t _e;
    double _v;
 
