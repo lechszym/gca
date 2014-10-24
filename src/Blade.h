@@ -23,11 +23,13 @@ public:
       _v = v;
    }
 
-   Blade(double v, unsigned long e) : _e({e}) {
-      _v = v;
+   Blade(double v, unsigned long e) {
+       _e.push_back(e);
+       _v = v;
    }
 
-   Blade(double v, const ebase_t &e) : _e(e.begin(), e.end()) {
+   Blade(double v, const ebase_t &e) {
+      _e = e;
       _v = v;
    }
 
