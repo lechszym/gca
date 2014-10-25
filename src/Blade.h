@@ -54,19 +54,15 @@ public:
       return _v;
    }
 
-   Blade& dot(const Blade &B) const {
+   Blade& inner(const Blade &B) const {
       double v = _v * B._v;
 
       // If one of the numbers is scalar, we can speed up
       // calculation
       if (_e.empty()) {
-         if (B._e.empty()) {
-            return *(new Blade(v));
-         } else {
-            return *(new Blade());
-         }
+         return *(new Blade(v, B._e));
       } else if (B._e.empty()) {
-         return *(new Blade());
+         return *(new Blade(v,_e));
       }
 
       int sign;
@@ -80,19 +76,13 @@ public:
       }
    }
 
-   Blade& wedge(const Blade &B) const {
+   Blade& outer(const Blade &B) const {
       double v = _v * B._v;
 
       // If one of the numbers is scalar, we can speed up
       // calculation
-      if (_e.empty()) {
-         if (B._e.empty()) {
-            return *(new Blade());
-         } else {
-            return *(new Blade(v, B._e));
-         }
-      } else if (B._e.empty()) {
-         return *(new Blade(v, _e));
+      if (_e.empty() || B._e.empty()) {
+         return *(new Blade());
       }
 
       int sign;
@@ -121,11 +111,11 @@ public:
    }
 
    double mag(void) const {
-      /* Magnitude of a blade, it's the dot product
+      /* Magnitude of a blade, it's the inner product
          of a blade and its conjugate
          mag = A&(~A) */
 
-      Blade result = this->dot(this->conj());
+      Blade result = this->inner(this->conj());
       return result._v;
    }
 
@@ -160,11 +150,11 @@ public:
    }   
    
    Blade operator&(const Blade& B) const {
-      return this->dot(B);
+      return this->inner(B);
    }
 
    Blade operator^ (const Blade& B) const {
-      return this->wedge(B);
+      return this->outer(B);
    }
 
    Blade operator/(double x) const {
@@ -244,7 +234,7 @@ private:
            int *sign,
            bool *common) const {
 
-      bool wedge = *common;
+      bool outer = *common;
 
       ebase_t *e = new ebase_t();
       e->reserve(eA.size() + eB.size());
@@ -282,9 +272,9 @@ private:
             iB++;
             eB_iter++;
          } else {
-            //If doing wedge, then we're done - it will be zero
+            //If doing outer product, then we're done - it will be zero
             *common = true;
-            if (wedge) {
+            if (outer) {
                return *e;
             }
             eIntersect.push_back(*eA_iter);
@@ -297,10 +287,10 @@ private:
          }
       }
 
-      // If doing dot, then we're done - it will be zero
+      // If doing inner product, then we're done - it will be zero
       if (eIntersect.empty()) {
          *common = false;
-         if (!wedge) {
+         if (!outer) {
             return *e;
          }
       }

@@ -73,7 +73,7 @@ typedef std::list<Blade> blades_t;
 
       }
 
-      Mvec& dot(const Mvec &m) const {
+      Mvec& inner(const Mvec &m) const {
          Mvec *result = new Mvec();
 
          blades_t::const_iterator i;
@@ -88,7 +88,7 @@ typedef std::list<Blade> blades_t;
          return *result;
       }
 
-      Mvec& wedge(const Mvec &m) const {
+      Mvec& outer(const Mvec &m) const {
          Mvec *result = new Mvec();
 
          blades_t::const_iterator i;
@@ -245,11 +245,11 @@ typedef std::list<Blade> blades_t;
       }
 
       Mvec operator&(const Mvec& m) const {
-         return this->dot(m);
+         return this->inner(m);
       }
 
       Mvec operator^ (const Mvec& m) const {
-         return this->wedge(m);
+         return this->outer(m);
       }
 
       Mvec operator*(const Mvec& m) const {
@@ -277,11 +277,11 @@ typedef std::list<Blade> blades_t;
       }
 
       Mvec operator-(const Mvec& m) const {
-         return this->add(m);
+         return this->sub(m);
       }
 
       Mvec operator-(double x) const {
-         return this->add(x);
+         return this->sub(x);
       }
 
       Mvec& operator=(const Mvec& m) {
