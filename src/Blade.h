@@ -235,21 +235,21 @@ private:
            bool *common) const {
 
       bool outer = *common;
+      *common = false;
+      
+      //ebase_t *e = new ebase_t();
+      //e->reserve(eA.size() + eB.size());
 
-      ebase_t *e = new ebase_t();
-      e->reserve(eA.size() + eB.size());
+      ebase_t *eC = new ebase_t();
+      eC->reserve(eA.size() + eB.size());
 
-      ebase_t eIntersect;
-      eIntersect.reserve(eA.size() + eB.size());
+      //ebase_t eBnot;
+      //eBnot.reserve(eA.size());
 
-      ebase_t eBnot;
-      eBnot.reserve(eA.size());
+      //ebase_t eAnot;
+      //eAnot.reserve(eB.size());
 
-      ebase_t eAnot;
-      eAnot.reserve(eB.size());
-
-      unsigned int iA = 0;
-      unsigned int iB = 0;
+      unsigned int iA = eA.size();
 
       *sign = 1;
 
@@ -258,29 +258,37 @@ private:
 
       while (true) {
          if (eA_iter == eA.end()) {
-            eAnot.insert(eAnot.end(), eB_iter, eB.end());
+            eC->insert(eC->end(), eB_iter, eB.end());
+            //eAnot.insert(eAnot.end(), eB_iter, eB.end());
             break;
          } else if (eB_iter == eB.end()) {
-            eBnot.insert(eBnot.end(), eA_iter, eA.end());
+            eC->insert(eC->end(), eA_iter, eA.end());
+            //eBnot.insert(eBnot.end(), eA_iter, eA.end());
             break;
          } else if (*eA_iter < *eB_iter) {
-            eBnot.push_back(*eA_iter);
-            iA++;
+            eC->push_back(*eA_iter);
+            //eBnot.push_back(*eA_iter);
+            iA--;
             eA_iter++;
          } else if (*eB_iter < *eA_iter) {
-            eAnot.push_back(*eB_iter);
-            iB++;
+            unsigned int flip = iA-- % 2;
+            if (flip != 0) {
+               *sign = -(*sign);
+            } 
+            eC->push_back(*eB_iter);
             eB_iter++;
          } else {
             //If doing outer product, then we're done - it will be zero
             *common = true;
             if (outer) {
-               return *e;
+                eC->clear();
+                break;
             }
-            eIntersect.push_back(*eA_iter);
-            unsigned int flip = (iA + iB) % 2;
-            if (flip != 0) {
-               *sign = -(*sign);
+            if(iA) {
+                unsigned int flip = --iA % 2;
+                if (flip != 0) {
+                   *sign = -(*sign);
+                }
             }
             eA_iter++;
             eB_iter++;
@@ -288,6 +296,13 @@ private:
       }
 
       // If doing inner product, then we're done - it will be zero
+      if(!outer && !(*common)) {
+          eC->clear();
+      }
+
+      return *eC;
+      
+      /*
       if (eIntersect.empty()) {
          *common = false;
          if (!outer) {
@@ -327,7 +342,7 @@ private:
          }
       }
 
-      return *e;
+      return *e;*/
    }
 
 protected:
