@@ -237,17 +237,8 @@ private:
       bool outer = *common;
       *common = false;
       
-      //ebase_t *e = new ebase_t();
-      //e->reserve(eA.size() + eB.size());
-
       ebase_t *eC = new ebase_t();
       eC->reserve(eA.size() + eB.size());
-
-      //ebase_t eBnot;
-      //eBnot.reserve(eA.size());
-
-      //ebase_t eAnot;
-      //eAnot.reserve(eB.size());
 
       unsigned int iA = eA.size();
 
@@ -259,26 +250,22 @@ private:
       while (true) {
          if (eA_iter == eA.end()) {
             eC->insert(eC->end(), eB_iter, eB.end());
-            //eAnot.insert(eAnot.end(), eB_iter, eB.end());
             break;
          } else if (eB_iter == eB.end()) {
             eC->insert(eC->end(), eA_iter, eA.end());
-            //eBnot.insert(eBnot.end(), eA_iter, eA.end());
             break;
          } else if (*eA_iter < *eB_iter) {
             eC->push_back(*eA_iter);
-            //eBnot.push_back(*eA_iter);
             iA--;
             eA_iter++;
          } else if (*eB_iter < *eA_iter) {
-            unsigned int flip = iA-- % 2;
+            unsigned int flip = iA % 2;
             if (flip != 0) {
                *sign = -(*sign);
             } 
             eC->push_back(*eB_iter);
             eB_iter++;
          } else {
-            //If doing outer product, then we're done - it will be zero
             *common = true;
             if (outer) {
                 eC->clear();
@@ -300,49 +287,7 @@ private:
           eC->clear();
       }
 
-      return *eC;
-      
-      /*
-      if (eIntersect.empty()) {
-         *common = false;
-         if (!outer) {
-            return *e;
-         }
-      }
-
-      iA = eBnot.size();
-
-      eA_iter = eBnot.begin();
-      eB_iter = eAnot.begin();
-
-      while (true) {
-         if (eA_iter == eBnot.end()) {
-            while (eB_iter != eAnot.end()) {
-               e->push_back(*eB_iter++);
-            }
-            break;
-         } else if (eB_iter == eAnot.end()) {
-            while (eA_iter != eBnot.end()) {
-               e->push_back(*eA_iter++);
-            }
-            break;
-         } else if (*eA_iter < *eB_iter) {
-            e->push_back(*eA_iter);
-            iA--;
-            eA_iter++;
-         } else if (*eB_iter < *eA_iter) {
-            e->push_back(*eB_iter);
-            unsigned int flip = iA % 2;
-            if (flip != 0) {
-               *sign = -(*sign);
-            }
-            eB_iter++;
-         } else {
-            std::cout << "SHOULD NOT GET HERE!!!!!";
-         }
-      }
-
-      return *e;*/
+      return *eC;      
    }
 
 protected:
