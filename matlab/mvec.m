@@ -1,4 +1,30 @@
 classdef mvec < handle
+% MVEC create a Geometric Algebra multi-vector
+%
+%   mvec without argument returns a 0 scalar multi-vector
+%
+%   mvec(x) where x is a scalar value returns an x scalar multi-vector 
+%
+%   mvec(x) where x is a vector returns a pure multi-vector
+%
+%   Examples:
+%
+%   mvec([0 1]) creates a multi-vector: 1 e2
+%   mvec([3 2 4]) creates a multi-vector: 3 e1 +2 e2 +4 e3
+%   mvec(2.5) creates a multi-vector: 2.5
+%
+%   a = mvec([3 2]);
+%   b = mvec([-1 1]);
+%   a.*b - gives inner product
+%   a^b - gives outer product
+%   a*b = a.*b + a^b - gives geometric product
+%   a/b - divides multi-vectors
+%   a+b - adds multi-vectors
+%   a-b - subtracts multi-vectors
+%   a.grade(x) - returns a pure multi-vector with blades of grade x
+%   a.vec(dim) - converts multi-vector to vector of dimenison dim
+%   a.scalar - return scalar part of multi-vector
+
    properties (Hidden)
 
    end
@@ -7,8 +33,12 @@ classdef mvec < handle
       gcamdata=[];
    end
    methods
+      % Create a new multivector
       function m = mvec(x)
-         if(ischar(x))
+         % If no arguments passed in, create a zero-scalara vector
+         if(~exist('x','var'))
+             m.gcamdata = gcamvec('n',0);          
+         elseif(ischar(x))
              m.gcamdata = gcamvec('n',x);
          elseif(iscell(x))
              m.gcamdata = x; 
