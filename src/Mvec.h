@@ -39,32 +39,47 @@ typedef std::list<Blade> blades_t;
 #endif
       }
 
-      Mvec(const Blade &b) : Mvec() {
+      Mvec(const Blade &b) {
+#ifdef OMP_ENABLED
+         omp_init_lock(&plock);
+#endif
          _blades.push_back(b);
       }
 
-      Mvec(double v) : Mvec() {
+      Mvec(double v) {
+#ifdef OMP_ENABLED
+         omp_init_lock(&plock);
+#endif
          _blades.push_back(Blade(v));
       }
 
       Mvec(double v, unsigned long e) : Mvec() {
+#ifdef OMP_ENABLED
+         omp_init_lock(&plock);
+#endif
          _blades.push_back(Blade(v,e));
       }
 
-      Mvec(const blades_t& blades) : Mvec() {
+      Mvec(const blades_t& blades) {
+#ifdef OMP_ENABLED
+         omp_init_lock(&plock);
+#endif
          _blades = blades;
       }
 
 #ifdef EIGEN_ENABLED
 
-      Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) : Mvec() {
+      Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
+#ifdef OMP_ENABLED
+         omp_init_lock(&plock);
+#endif
          for (unsigned int i = 0; i < v.size(); i++) {
             _blades.push_back(Blade(v(i, 0), i + 1));
          }
          this->prune();
       }
 
-      Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) : Mvec () {
+      Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
          for (unsigned int i = 0; i < v.size(); i++) {
             _blades.push_back(Blade(v(0, i), i + 1));
          }
@@ -72,7 +87,10 @@ typedef std::list<Blade> blades_t;
       }
 #endif
 
-      Mvec(const Mvec& orig) : Mvec() {
+      Mvec(const Mvec& orig) {
+#ifdef OMP_ENABLED
+         omp_init_lock(&plock);
+#endif
          _blades = orig._blades;
       }
 
