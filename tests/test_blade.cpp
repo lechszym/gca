@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
    cout << c1 << endl;
    cout << c1.inv() << endl;
    
-   Blade c3 = c1.dot(b2);
+   Blade c3 = c1&b2;
    
    cout << c3 << endl;
     //Blade a1("-1 e1");

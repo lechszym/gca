@@ -18,6 +18,10 @@
 #include <Eigen/Dense>
 #endif
 
+#ifdef OMP_ENABLED
+#include <omp.h>
+#endif
+
 namespace gca {
 
 typedef std::list<Blade> blades_t;
@@ -30,34 +34,37 @@ typedef std::list<Blade> blades_t;
    public:
 
       Mvec() {
+#ifdef OMP_ENABLED
+         omp_init_lock(&plock);
+#endif
       }
 
-      Mvec(const Blade &b) {
+      Mvec(const Blade &b) : Mvec() {
          _blades.push_back(b);
       }
 
-      Mvec(double v) {
+      Mvec(double v) : Mvec() {
          _blades.push_back(Blade(v));
       }
 
-      Mvec(double v, unsigned long e) {
+      Mvec(double v, unsigned long e) : Mvec() {
          _blades.push_back(Blade(v,e));
       }
 
-      Mvec(const blades_t& blades) {
+      Mvec(const blades_t& blades) : Mvec() {
          _blades = blades;
       }
 
 #ifdef EIGEN_ENABLED
 
-      Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
+      Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) : Mvec() {
          for (unsigned int i = 0; i < v.size(); i++) {
             _blades.push_back(Blade(v(i, 0), i + 1));
          }
          this->prune();
       }
 
-      Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
+      Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) : Mvec () {
          for (unsigned int i = 0; i < v.size(); i++) {
             _blades.push_back(Blade(v(0, i), i + 1));
          }
@@ -65,12 +72,14 @@ typedef std::list<Blade> blades_t;
       }
 #endif
 
-      Mvec(const Mvec& orig) {
+      Mvec(const Mvec& orig) : Mvec() {
          _blades = orig._blades;
       }
 
       virtual ~Mvec() {
-
+#ifdef OMP_ENABLED
+         omp_destroy_lock(&plock);
+#endif
       }
 
       Mvec& inner(const Mvec &m) const {
@@ -79,11 +88,33 @@ typedef std::list<Blade> blades_t;
          blades_t::const_iterator i;
          blades_t::const_iterator j;
 
-         for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            for (j = m._blades.begin(); j != m._blades.end(); j++) {
-               result->_blades.push_back((*i)&(*j));
+#ifdef OMP_ENABLED         
+         int P=omp_get_num_procs(); 
+         omp_lock_t writelock;
+         omp_init_lock(&writelock);
+         int k=0;
+#pragma omp parallel for shared(result,_blades,m) private(i,j)
+         for(int p=0;p<P;p++) {
+            Mvec *presult = new Mvec();
+#else
+            Mvec *presult = result;
+#endif
+            for (i = _blades.begin(); i != this->_blades.end(); i++) {
+               for (j = m._blades.begin(); j != m._blades.end(); j++) {
+#ifdef OMP_ENABLED
+                  if(k++%P != p) {
+                     continue;
+                  }
+#endif               
+                  presult->_blades.push_back((*i)&(*j));
+               }
             }
+#ifdef OMP_ENABLED
+            omp_set_lock(&plock);      
+            result->insert(result->end(),presult->begin(),presult->end());
+            omp_unset_lock(&plock);
          }
+#endif
          result->prune();
          return *result;
       }
@@ -359,7 +390,10 @@ typedef std::list<Blade> blades_t;
       }
 
       blades_t _blades;
-
+#ifdef OMP_ENABLED         
+      omp_lock_t plock;
+#endif
+      
    };
 }
 
