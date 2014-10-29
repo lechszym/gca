@@ -38,9 +38,18 @@ Mvec generate_mvec(unsigned int maxBlades, unsigned int maxGrade) {
    unsigned long i=0;
    while(i < nblades) {
       Blade b = generate_blade(maxGrade);
-      blades_t::iterator bi = std::find(blades.begin(),blades.end(),b);
-      if(bi == blades.end()) {
-         blades.push_back(b);
+      blades_t::iterator i;
+      bool repeat = false;
+      
+      for(size_t j=0;j<blades.size();j++) {
+         if(b == *blades[j]) {
+            repeat = true;
+            break;
+         }
+      }
+      
+      if(!repeat) {
+         blades.push_back(new Blade(b));
          i++;
       }
    }

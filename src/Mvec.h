@@ -25,7 +25,7 @@
 
 namespace gca {
 
-typedef std::vector<Blade> blades_t;
+typedef std::vector<Blade *> blades_t;
 
 #ifndef GCA_PRECISION
 #define GCA_PRECISION  1e-12
@@ -38,33 +38,35 @@ typedef std::vector<Blade> blades_t;
       }
 
       Mvec(const Blade &b) {
-         _blades.push_back(b);
+         _blades.push_back(new Blade(b));
       }
 
       Mvec(double v) {
-         _blades.push_back(Blade(v));
+         _blades.push_back(new Blade(v));
       }
 
       Mvec(double v, unsigned long e) {
-         _blades.push_back(Blade(v,e));
+         _blades.push_back(new Blade(v,e));
       }
 
       Mvec(const blades_t& blades) {
-         _blades = blades;
+         for(std::size_t i=0;i<blades.size();i++) {
+            _blades.push_back(new Blade(*blades[i]));
+         }
       }
 
 #ifdef EIGEN_ENABLED
 
       Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
          for (unsigned int i = 0; i < v.size(); i++) {
-            _blades.push_back(Blade(v(i, 0), i + 1));
+            _blades.push_back(new Blade(v(i, 0), i + 1));
          }
          this->prune();
       }
 
       Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
          for (unsigned int i = 0; i < v.size(); i++) {
-            _blades.push_back(Blade(v(0, i), i + 1));
+            _blades.push_back(new Blade(v(0, i), i + 1));
          }
          this->prune();
       }
@@ -75,7 +77,9 @@ typedef std::vector<Blade> blades_t;
       }
 
       virtual ~Mvec() {
-
+         for(std::size_t i=0;i<_blades.size();i++) {
+            delete _blades[i];
+         }
       }
 
       Mvec& inner(const Mvec &m) const {
@@ -91,7 +95,10 @@ typedef std::vector<Blade> blades_t;
 
         for (i = mB->begin(); i != mB->end(); i++) {
            for (j = nB->begin(); j != nB->end(); j++) {
-               result->_blades.push_back((*i)&(*j));
+               Blade *a = *i;
+               Blade *b = *j;
+               Blade *c = &a->inner(*b);
+               result->_blades.push_back(c);
             }
         }
 //#endif
@@ -140,7 +147,10 @@ typedef std::vector<Blade> blades_t;
 
          for (i = _blades.begin(); i != this->_blades.end(); i++) {
             for (j = m._blades.begin(); j != m._blades.end(); j++) {
-               result->_blades.push_back((*i)^(*j));
+               Blade *a = *i;
+               Blade *b = *j;
+               Blade *c = &a->outer(*b);
+               result->_blades.push_back(c);
             }
          }
          result->prune();
@@ -155,12 +165,12 @@ typedef std::vector<Blade> blades_t;
 
          for (i = _blades.begin(); i != this->_blades.end(); i++) {
             for (j = m._blades.begin(); j != m._blades.end(); j++) {
-               //std::cout << *i << " & " << *j << " = ";
-               result->_blades.push_back((*i)&(*j));
-               //std::cout << result->_blades.back() << std::endl;
-               //std::cout << *i << " ^ " << *j << " = ";
-               result->_blades.push_back((*i)^(*j));
-               //std::cout << result->_blades.back() << std::endl;
+               Blade *a = *i;
+               Blade *b = *j;
+               Blade *c = &a->inner(*b);
+               result->_blades.push_back(c);
+               c = &a->outer(*b);
+               result->_blades.push_back(c);
             }
          }
          result->prune();
@@ -173,7 +183,10 @@ typedef std::vector<Blade> blades_t;
          blades_t::const_iterator i;
 
          for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            result->_blades.push_back((*i) * x);
+            Blade *a = *i;
+            Blade *c = new Blade(*a);
+            c->set(c->get() * x);
+            result->_blades.push_back(c);
          }
          result->prune();
          return *result;
@@ -185,7 +198,10 @@ typedef std::vector<Blade> blades_t;
          blades_t::const_iterator i;
 
          for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            result->_blades.push_back((*i) / x);
+            Blade *a = *i;
+            Blade *c = new Blade(*a);
+            c->set(c->get() / x);
+            result->_blades.push_back(c);
          }
          result->prune();
          return *result;
@@ -213,10 +229,11 @@ typedef std::vector<Blade> blades_t;
          Mvec *result = new Mvec(_blades);
 
 
-         blades_t::iterator bi = result->_blades.begin();
-         while (bi != result->_blades.end()) {
-            bi->set(bi->get() + x);
-            bi++;
+         blades_t::iterator i = result->_blades.begin();
+         while (i != result->_blades.end()) {
+            Blade *a = *i;
+            a->set(a->get() + x);
+            i++;
          }
          result->prune();
          return *result;
@@ -234,10 +251,11 @@ typedef std::vector<Blade> blades_t;
       Mvec& sub(double x) const {
          Mvec *result = new Mvec(_blades);
 
-         blades_t::iterator bi = result->_blades.begin();
-         while (bi != result->_blades.end()) {
-            bi->set(bi->get() - x);
-            bi++;
+         blades_t::iterator i = result->_blades.begin();
+         while (i != result->_blades.end()) {
+            Blade *a = *i;
+            a->set(a->get() - x);
+            i++;
          }
          result->prune();
          return *result;
@@ -247,7 +265,7 @@ typedef std::vector<Blade> blades_t;
          double m = 0;
          blades_t::const_iterator i;
          for (i = this->_blades.begin(); i != this->_blades.end(); i++) {
-            m += i->mag();
+            m += (*i)->mag();
          }
          return m;
       }
@@ -258,7 +276,9 @@ typedef std::vector<Blade> blades_t;
          blades_t::const_iterator i;
 
          for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            result->_blades.push_back(i->conj());
+            Blade *a = *i;
+            Blade *c = &a->conj();
+            result->_blades.push_back(c);
          }
          result->prune();
          return *result;
@@ -272,12 +292,12 @@ typedef std::vector<Blade> blades_t;
          if (_blades.empty()) {
             ss << "0";
          } else {
-            sort(_blades.begin(),_blades.end());
+            //sort(_blades.begin(),_blades.end());
             blades_t::iterator i;
             for (i = _blades.begin(); i != _blades.end(); i++) {
                if (!beg) {
                   ss << " ";
-                  if (i->get() >= 0) {
+                  if ((*i)->get() >= 0) {
                      ss << "+";
                   }
                }
@@ -345,7 +365,7 @@ typedef std::vector<Blade> blades_t;
 
         blades_t::const_iterator i;
         for(i=_blades.begin();i!=_blades.end();i++) {
-            if(i->grade()== nIndex) {
+            if((*i)->grade()== nIndex) {
                 result._blades.push_back(*i);
             }
         }
@@ -366,36 +386,43 @@ typedef std::vector<Blade> blades_t;
          }
           
          blades_t unique;
-         //blades_t duplicates;
          
          unique.push_back(_blades[0]);
          
          for(std::size_t i=1;i<_blades.size();i++) {
-             Blade *b = &_blades[i];
-             blades_t::iterator bi = std::find(unique.begin(),unique.end(),*b);
-             if(bi != unique.end()) {
-                 bi->set(bi->get()+b->get());
-                 //duplicates.push_back(*b);
+             Blade *a = _blades[i];
+             bool reduction = false;
+             for(std::size_t j=0;j<unique.size();j++) {
+                Blade *b = unique[j];
+                if(*a == *b) {
+                   b->set(a->get()+b->get());
+                   reduction = true;
+                   break;
+                }
+             }
+             if(reduction) {
+                delete a;
              } else {
-                 unique.push_back(*b);
+                unique.push_back(a);
              }
          }
          
          blades_t unique_nonzero;
          
          for(std::size_t i=0;i<unique.size();i++) {
-             Blade *b = &unique[i];
-             double v = b->get();
+             Blade *a = unique[i];
+             double v = a->get();
 
              if (v > GCA_PRECISION || v < (-GCA_PRECISION)) {
-                 unique_nonzero.push_back(*b);
-                 
+                unique_nonzero.push_back(a);
+             } else {
+                delete a;
              }
          }
          
          _blades.clear();
          if(unique_nonzero.empty()) {
-             _blades.push_back(Blade(0));
+             _blades.push_back(new Blade(0));
          } else {
              _blades.insert(_blades.end(),unique_nonzero.begin(),unique_nonzero.end());
          }
