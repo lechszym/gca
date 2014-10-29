@@ -60,7 +60,44 @@ int main(int argc, char **argv) {
                end = clock();
                elapsed_secs += double(end - begin);
                cout << "(" << A << ")^~(" << B << ")=" << C << endl;
-         //cout << "#-----------------------------------------------" << endl;
+
+               begin = clock();
+               C = A*B;
+               end = clock();
+               elapsed_secs += double(end - begin);
+               cout << "(" << A << ")*(" << B << ")=" << C << endl;
+               
+               begin = clock();
+               C = A+nB;
+               end = clock();
+               elapsed_secs += double(end - begin);
+               cout << "(" << A << ")*(" << B << ")=" << C << endl;
+               
+               begin = clock();
+               C = A+B;
+               end = clock();
+               elapsed_secs += double(end - begin);
+               cout << "(" << A << ")+(" << B << ")=" << C << endl;
+               
+               begin = clock();
+               C = A+nB;
+               end = clock();
+               elapsed_secs += double(end - begin);
+               cout << "(" << A << ")+~(" << B << ")=" << C << endl;
+
+               begin = clock();
+               C = A-B;
+               end = clock();
+               elapsed_secs += double(end - begin);
+               cout << "(" << A << ")-(" << B << ")=" << C << endl;
+
+               begin = clock();
+               C = A-nB;
+               end = clock();
+               elapsed_secs += double(end - begin);
+               cout << "(" << A << ")-~(" << B << ")=" << C << endl;
+               
+               //cout << "#-----------------------------------------------" << endl;
          //cout << "Time taken " << elapsed_secs / CLOCKS_PER_SEC << " s." << endl;
          //cout << "#-----------------------------------------------" << endl;
          tot_time += elapsed_secs;
