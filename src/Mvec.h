@@ -73,7 +73,9 @@ typedef std::vector<Blade *> blades_t;
 #endif
 
       Mvec(const Mvec& orig) {
-         _blades = orig._blades;
+         for(std::size_t i=0;i<orig._blades.size();i++) {
+            _blades.push_back(new Blade(*orig._blades[i]));
+         }
       }
 
       virtual ~Mvec() {
@@ -210,8 +212,8 @@ typedef std::vector<Blade *> blades_t;
       Mvec& div(const Mvec& m) const {
          double mMag = m.mag();
          Mvec mInv = m.conj();
-
-         Mvec *result = new Mvec(this->mul(mInv.div(mMag)));
+         mInv = mInv.div(mMag);
+         Mvec *result = new Mvec(this->mul(mInv));
 
          result->prune();
          return *result;
@@ -302,7 +304,7 @@ typedef std::vector<Blade *> blades_t;
                   }
                }
                beg = false;
-               ss << *i;
+               ss << **i;
             }
          }
          return ss.str();
@@ -350,7 +352,9 @@ typedef std::vector<Blade *> blades_t;
 
       Mvec& operator=(const Mvec& m) {
          if (this != &m) {
-            _blades = m._blades;
+           for(std::size_t i=0;i<m._blades.size();i++) {
+               _blades.push_back(new Blade(*m._blades[i]));
+           }
          }
          return *this;
 

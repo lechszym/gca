@@ -38,7 +38,6 @@ Mvec generate_mvec(unsigned int maxBlades, unsigned int maxGrade) {
    unsigned long i=0;
    while(i < nblades) {
       Blade b = generate_blade(maxGrade);
-      blades_t::iterator i;
       bool repeat = false;
       
       for(size_t j=0;j<blades.size();j++) {
