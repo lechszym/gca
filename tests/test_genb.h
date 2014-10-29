@@ -3,6 +3,7 @@
 
 #include <Mvec>
 
-gca::Blade generate_blade(unsigned int dim);
+gca::Blade generate_blade(unsigned int maxGrade);
+gca::Mvec generate_mvec(unsigned int maxBlades,unsigned int maxGrade);
 
 #endif

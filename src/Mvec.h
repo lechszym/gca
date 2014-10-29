@@ -79,12 +79,28 @@ typedef std::list<Blade> blades_t;
       }
 
       Mvec& inner(const Mvec &m) const {
-         const blades_t *nb = &_blades;
-         const blades_t *mb = &m._blades;
          Mvec *result = new Mvec();
+         const blades_t *mB = &_blades;
+         const blades_t *nB = &m._blades;
+//#ifdef OMP_ENABLED
+         //std::size_t  nops = 
+         
+//#else
+        blades_t::const_iterator i;
+        blades_t::const_iterator j;
 
-         blades_t::const_iterator i;
-         blades_t::const_iterator j;
+        for (i = mB->begin(); i != mB->end(); i++) {
+           for (j = nB->begin(); j != nB->end(); j++) {
+               result->_blades.push_back((*i)&(*j));
+            }
+        }
+//#endif
+          
+/*          
+          
+          const blades_t *nb = &_blades;
+         const blades_t *mb = &m._blades;
+
 
 #ifdef OMP_ENABLED         
          int P=std::min(omp_get_num_procs(),(int) (nb->size()*mb->size()) ); 
@@ -111,7 +127,7 @@ typedef std::list<Blade> blades_t;
                result->_blades.insert(result->_blades.end(),rb->begin(),rb->end());
             }
          }
-#endif
+#endif*/
          result->prune();
          return *result;
       }

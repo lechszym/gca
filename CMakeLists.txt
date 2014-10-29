@@ -16,7 +16,7 @@ if(EIGEN_FOUND)
   add_definitions(-DEIGEN_ENABLED)
 endif(EIGEN_FOUND)
 
-set(CMAKE_CXX_FLAGS "-g -Wall -std=c++0x -O3") # -fopenmp -DOMP_ENABLED")
+set(CMAKE_CXX_FLAGS "-g -Wall -std=c++0x -O3")
 
 # add a target to generate API documentation with Doxygen
 #find_package(Doxygen)
