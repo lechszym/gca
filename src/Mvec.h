@@ -83,28 +83,13 @@ typedef std::vector<Blade> blades_t;
          std::size_t Na = _blades.size();
          std::size_t Nb = m._blades.size();
          std::size_t N = Na*Nb;
-         //std::cout << "Na=" << Na << " Nb=" << Nb << " N=" << N << "\n";
-//#ifdef OMP_ENABLED
-         //std::size_t  nops = 
-         
-//#else
-         /*blades_t::const_iterator i;
-         blades_t::const_iterator j;
+         result->_blades = blades_t(N);
 
-         for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            for (j = m._blades.begin(); j != m._blades.end(); j++) {
-               result->_blades.push_back((*i)^(*j));
-            }
-         } */        
-         std::cout << " ? " << *this << " & " << m << "\n";
-         
          for(std::size_t n=0;n<N;n++) {
             std::size_t ia = n/Nb;
             std::size_t ib = n%Nb;
-            std::cout << " | " << _blades[ia] << " & " << m._blades[ib] << " = " << ((_blades[ia])&(m._blades[ib])) << "\n";
-            result->_blades.push_back((_blades[ia])&(m._blades[ib]));
+            result->_blades[n]=((_blades[ia])&(m._blades[ib]));
          }
-        
 //#endif
           
 /*          
@@ -145,34 +130,33 @@ typedef std::vector<Blade> blades_t;
 
       Mvec& outer(const Mvec &m) const {
          Mvec *result = new Mvec();
+         std::size_t Na = _blades.size();
+         std::size_t Nb = m._blades.size();
+         std::size_t N = Na*Nb;
+         result->_blades = blades_t(N);
 
-         blades_t::const_iterator i;
-         blades_t::const_iterator j;
-
-         for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            for (j = m._blades.begin(); j != m._blades.end(); j++) {
-               result->_blades.push_back((*i)^(*j));
-            }
+         for(std::size_t n=0;n<N;n++) {
+            std::size_t ia = n/Nb;
+            std::size_t ib = n%Nb;
+            result->_blades[n] = ((_blades[ia])^(m._blades[ib]));
          }
+
          result->prune();
          return *result;
       }
 
       Mvec& mul(const Mvec &m) const {
          Mvec *result = new Mvec();
+         std::size_t Na = _blades.size();
+         std::size_t Nb = m._blades.size();
+         std::size_t N = Na*Nb;
+         result->_blades = blades_t(2*N);
 
-         blades_t::const_iterator i;
-         blades_t::const_iterator j;
-
-         for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            for (j = m._blades.begin(); j != m._blades.end(); j++) {
-               //std::cout << *i << " & " << *j << " = ";
-               result->_blades.push_back((*i)&(*j));
-               //std::cout << result->_blades.back() << std::endl;
-               //std::cout << *i << " ^ " << *j << " = ";
-               result->_blades.push_back((*i)^(*j));
-               //std::cout << result->_blades.back() << std::endl;
-            }
+         for(std::size_t n=0;n<N;n++) {
+            std::size_t ia = n/Nb;
+            std::size_t ib = n%Nb;
+            result->_blades[n*2] = ((_blades[ia])&(m._blades[ib]));
+            result->_blades[n*2+1] = ((_blades[ia])^(m._blades[ib]));
          }
          result->prune();
          return *result;
@@ -180,11 +164,10 @@ typedef std::vector<Blade> blades_t;
 
       Mvec& mul(const double x) const {
          Mvec *result = new Mvec();
-
-         blades_t::const_iterator i;
-
-         for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            result->_blades.push_back((*i) * x);
+         result->_blades = blades_t(_blades.size());
+         
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            result->_blades[i] = _blades[i] * x;
          }
          result->prune();
          return *result;
