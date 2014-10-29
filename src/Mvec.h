@@ -13,6 +13,7 @@
 #include <sstream>
 #include <math.h>
 #include <iostream>
+#include <algorithm>
 
 #ifdef EIGEN_ENABLED
 #include <Eigen/Dense>
@@ -20,12 +21,11 @@
 
 #ifdef OMP_ENABLED
 #include <omp.h>
-#include <algorithm>
 #endif
 
 namespace gca {
 
-typedef std::list<Blade> blades_t;
+typedef std::vector<Blade> blades_t;
 
 #ifndef GCA_PRECISION
 #define GCA_PRECISION  1e-12
@@ -272,7 +272,7 @@ typedef std::list<Blade> blades_t;
          if (_blades.empty()) {
             ss << "0";
          } else {
-            _blades.sort();
+            sort(_blades.begin(),_blades.end());
             blades_t::iterator i;
             for (i = _blades.begin(); i != _blades.end(); i++) {
                if (!beg) {
@@ -361,6 +361,46 @@ typedef std::list<Blade> blades_t;
    protected:
 
       void prune() {
+         if(_blades.size() < 2) {
+             return;
+         }
+          
+         blades_t unique;
+         //blades_t duplicates;
+         
+         unique.push_back(_blades[0]);
+         
+         for(std::size_t i=1;i<_blades.size();i++) {
+             Blade *b = &_blades[i];
+             blades_t::iterator bi = std::find(unique.begin(),unique.end(),*b);
+             if(bi != unique.end()) {
+                 bi->set(bi->get()+b->get());
+                 //duplicates.push_back(*b);
+             } else {
+                 unique.push_back(*b);
+             }
+         }
+         
+         blades_t unique_nonzero;
+         
+         for(std::size_t i=0;i<unique.size();i++) {
+             Blade *b = &unique[i];
+             double v = b->get();
+
+             if (v > GCA_PRECISION || v < (-GCA_PRECISION)) {
+                 unique_nonzero.push_back(*b);
+                 
+             }
+         }
+         
+         _blades.clear();
+         if(unique_nonzero.empty()) {
+             _blades.push_back(Blade(0));
+         } else {
+             _blades.insert(_blades.end(),unique_nonzero.begin(),unique_nonzero.end());
+         }
+         
+          /*
          blades_t::iterator i;
          blades_t::iterator j;
          blades_t::iterator k;
@@ -399,7 +439,7 @@ typedef std::list<Blade> blades_t;
             } else {
                i++;
             }
-         }
+         }*/
       }
 
       blades_t _blades;
