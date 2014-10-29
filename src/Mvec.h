@@ -80,20 +80,31 @@ typedef std::vector<Blade> blades_t;
 
       Mvec& inner(const Mvec &m) const {
          Mvec *result = new Mvec();
-         const blades_t *mB = &_blades;
-         const blades_t *nB = &m._blades;
+         std::size_t Na = _blades.size();
+         std::size_t Nb = m._blades.size();
+         std::size_t N = Na*Nb;
+         //std::cout << "Na=" << Na << " Nb=" << Nb << " N=" << N << "\n";
 //#ifdef OMP_ENABLED
          //std::size_t  nops = 
          
 //#else
-        blades_t::const_iterator i;
-        blades_t::const_iterator j;
+         /*blades_t::const_iterator i;
+         blades_t::const_iterator j;
 
-        for (i = mB->begin(); i != mB->end(); i++) {
-           for (j = nB->begin(); j != nB->end(); j++) {
-               result->_blades.push_back((*i)&(*j));
+         for (i = _blades.begin(); i != this->_blades.end(); i++) {
+            for (j = m._blades.begin(); j != m._blades.end(); j++) {
+               result->_blades.push_back((*i)^(*j));
             }
-        }
+         } */        
+         std::cout << " ? " << *this << " & " << m << "\n";
+         
+         for(std::size_t n=0;n<N;n++) {
+            std::size_t ia = n/Nb;
+            std::size_t ib = n%Nb;
+            std::cout << " | " << _blades[ia] << " & " << m._blades[ib] << " = " << ((_blades[ia])&(m._blades[ib])) << "\n";
+            result->_blades.push_back((_blades[ia])&(m._blades[ib]));
+         }
+        
 //#endif
           
 /*          
@@ -265,15 +276,15 @@ typedef std::vector<Blade> blades_t;
 
       }
 
-      std::string toString() {
+      std::string toString() const {
          std::stringstream ss;
          bool beg = true;
 
          if (_blades.empty()) {
             ss << "0";
          } else {
-            sort(_blades.begin(),_blades.end());
-            blades_t::iterator i;
+            //sort(_blades.begin(),_blades.end());
+            blades_t::const_iterator i;
             for (i = _blades.begin(); i != _blades.end(); i++) {
                if (!beg) {
                   ss << " ";
@@ -353,7 +364,7 @@ typedef std::vector<Blade> blades_t;
       }
      
 
-      friend std::ostream& operator<<(std::ostream &out, Mvec &v) {
+      friend std::ostream& operator<<(std::ostream &out, const Mvec &v) {
          out << v.toString();
          return out;
       }

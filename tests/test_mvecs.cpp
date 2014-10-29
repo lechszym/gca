@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
    srand(1);
    
    for (unsigned int i = 0; i < numTests; i++) {
-      mvecs.push_back(generate_mvec(100,58));
+      mvecs.push_back(generate_mvec(5,4));
    }
 
    for (size_t i = 0; i < mvecs.size(); i++) {
