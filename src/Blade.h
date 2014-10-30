@@ -134,7 +134,12 @@ public:
       v = v / 10000;
 
 
-      ss << v << " ";
+      ss << v;
+      
+      if(!_e.empty()) {
+         ss << " ";
+      }
+   
 
       ebase_t::const_iterator eA_iter = _e.begin();
 

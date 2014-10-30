@@ -41,8 +41,8 @@ typedef std::vector<Blade> blades_t;
          _blades.push_back(b);
       }
 
-      Mvec(double v) {
-         _blades.push_back(Blade(v));
+      Mvec(std::size_t N) {
+         _blades = blades_t(N);
       }
 
       Mvec(double v, unsigned long e) {
@@ -56,15 +56,17 @@ typedef std::vector<Blade> blades_t;
 #ifdef EIGEN_ENABLED
 
       Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
+         _blades = blades_t(v.size());
          for (unsigned int i = 0; i < v.size(); i++) {
-            _blades.push_back(Blade(v(i, 0), i + 1));
+            _blades[i] = Blade(v(i, 0), i + 1);
          }
          this->prune();
       }
 
       Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
+         _blades = blades_t(v.size());
          for (unsigned int i = 0; i < v.size(); i++) {
-            _blades.push_back(Blade(v(0, i), i + 1));
+            _blades[i] = Blade(v(0, i), i + 1);
          }
          this->prune();
       }
@@ -79,107 +81,79 @@ typedef std::vector<Blade> blades_t;
       }
 
       Mvec& inner(const Mvec &m) const {
-         Mvec *result = new Mvec();
-         std::size_t Na = _blades.size();
-         std::size_t Nb = m._blades.size();
+         const blades_t *a = &_blades;
+         const blades_t *b = &m._blades;        
+         std::size_t Na = a->size();
+         std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
-         result->_blades = blades_t(N);
+         Mvec *result = new Mvec(N);
 
+#ifdef OMP_ENABLED         
+#pragma omp parallel for shared(result,a,b)
+#endif
          for(std::size_t n=0;n<N;n++) {
             std::size_t ia = n/Nb;
             std::size_t ib = n%Nb;
-            result->_blades[n]=((_blades[ia])&(m._blades[ib]));
+            result->_blades[n]= a->at(ia) & b->at(ib);
          }
-//#endif
-          
-/*          
-          
-          const blades_t *nb = &_blades;
-         const blades_t *mb = &m._blades;
-
-
-#ifdef OMP_ENABLED         
-         int P=std::min(omp_get_num_procs(),(int) (nb->size()*mb->size()) ); 
-#pragma omp parallel for shared(result,nb,mb) private(i,j)
-         for(int p=0;p<P;p++) {
-            blades_t *rb = new blades_t();
-            int k=0;
-#else
-            blades_t *rb = &result->_blades;
-#endif
-            for (i = nb->begin(); i != nb->end(); i++) {
-               for (j = mb->begin(); j != mb->end(); j++) {
-#ifdef OMP_ENABLED
-                  if(k++%P != p) {
-                     continue;
-                  }
-#endif               
-                  rb->push_back((*i)&(*j));
-               }
-            }
-#ifdef OMP_ENABLED
-            #pragma omp critical
-            {
-               result->_blades.insert(result->_blades.end(),rb->begin(),rb->end());
-            }
-         }
-#endif*/
          result->prune();
          return *result;
       }
 
       Mvec& outer(const Mvec &m) const {
-         Mvec *result = new Mvec();
-         std::size_t Na = _blades.size();
-         std::size_t Nb = m._blades.size();
+         const blades_t *a = &_blades;
+         const blades_t *b = &m._blades;        
+         std::size_t Na = a->size();
+         std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
-         result->_blades = blades_t(N);
+         Mvec *result = new Mvec(N);
 
+#ifdef OMP_ENABLED         
+#pragma omp parallel for shared(result,a,b)
+#endif
          for(std::size_t n=0;n<N;n++) {
             std::size_t ia = n/Nb;
             std::size_t ib = n%Nb;
-            result->_blades[n] = ((_blades[ia])^(m._blades[ib]));
+            result->_blades[n] = a->at(ia) ^ b->at(ib);
          }
-
          result->prune();
          return *result;
       }
 
       Mvec& mul(const Mvec &m) const {
-         Mvec *result = new Mvec();
-         std::size_t Na = _blades.size();
-         std::size_t Nb = m._blades.size();
+         const blades_t *a = &_blades;
+         const blades_t *b = &m._blades;        
+         std::size_t Na = a->size();
+         std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
-         result->_blades = blades_t(2*N);
+         Mvec *result = new Mvec(2*N);
 
+#ifdef OMP_ENABLED         
+#pragma omp parallel for shared(result,a,b)
+#endif
          for(std::size_t n=0;n<N;n++) {
             std::size_t ia = n/Nb;
             std::size_t ib = n%Nb;
-            result->_blades[n*2] = ((_blades[ia])&(m._blades[ib]));
-            result->_blades[n*2+1] = ((_blades[ia])^(m._blades[ib]));
+            result->_blades[n*2] = a->at(ia) & b->at(ib);
+            result->_blades[n*2+1] = a->at(ia) ^ b->at(ib);
          }
          result->prune();
          return *result;
       }
 
       Mvec& mul(const double x) const {
-         Mvec *result = new Mvec();
-         result->_blades = blades_t(_blades.size());
-         
-         for (std::size_t i = 0; i < _blades.size(); i++) {
-            result->_blades[i] = _blades[i] * x;
+         Mvec *result = new Mvec(_blades);
+         for (std::size_t i = 0; i < result->_blades.size(); i++) {
+            result->_blades[i].set(result->_blades[i].get() * x);
          }
          result->prune();
          return *result;
       }
 
       Mvec& div(const double x) const {
-         Mvec *result = new Mvec();
-
-         blades_t::const_iterator i;
-
-         for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            result->_blades.push_back((*i) / x);
+         Mvec *result = new Mvec(_blades);
+         for (std::size_t i = 0; i < result->_blades.size(); i++) {
+            result->_blades[i].set(result->_blades[i].get() / x);
          }
          result->prune();
          return *result;
@@ -188,9 +162,7 @@ typedef std::vector<Blade> blades_t;
       Mvec& div(const Mvec& m) const {
          double mMag = m.mag();
          Mvec mInv = m.conj();
-
          Mvec *result = new Mvec(this->mul(mInv.div(mMag)));
-
          result->prune();
          return *result;
       }
@@ -198,19 +170,14 @@ typedef std::vector<Blade> blades_t;
       Mvec& add(const Mvec& m) const {
          Mvec *result = new Mvec(_blades);
          result->_blades.insert(result->_blades.end(), m._blades.begin(), m._blades.end());
-
          result->prune();
          return *result;
       }
 
       Mvec& add(double x) const {
          Mvec *result = new Mvec(_blades);
-
-
-         blades_t::iterator bi = result->_blades.begin();
-         while (bi != result->_blades.end()) {
-            bi->set(bi->get() + x);
-            bi++;
+         for (std::size_t i = 0; i < result->_blades.size(); i++) {
+            result->_blades[i].set(result->_blades[i].get() + x);
          }
          result->prune();
          return *result;
@@ -218,20 +185,15 @@ typedef std::vector<Blade> blades_t;
 
       Mvec& sub(const Mvec& m) const {
          Mvec *result = new Mvec(m.mul(-1));
-
          result->_blades.insert(result->_blades.end(), _blades.begin(), _blades.end());
-
          result->prune();
          return *result;
       }
 
       Mvec& sub(double x) const {
          Mvec *result = new Mvec(_blades);
-
-         blades_t::iterator bi = result->_blades.begin();
-         while (bi != result->_blades.end()) {
-            bi->set(bi->get() - x);
-            bi++;
+         for (std::size_t i = 0; i < result->_blades.size(); i++) {
+            result->_blades[i].set(result->_blades[i].get() - x);
          }
          result->prune();
          return *result;
@@ -239,44 +201,37 @@ typedef std::vector<Blade> blades_t;
 
       double mag(void) const {
          double m = 0;
-         blades_t::const_iterator i;
-         for (i = this->_blades.begin(); i != this->_blades.end(); i++) {
-            m += i->mag();
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            m += _blades[i].mag();
          }
          return m;
       }
 
       Mvec& conj() const {
-         Mvec *result = new Mvec();
-
-         blades_t::const_iterator i;
-
-         for (i = _blades.begin(); i != this->_blades.end(); i++) {
-            result->_blades.push_back(i->conj());
+         Mvec *result = new Mvec(_blades.size());
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            result->_blades[i] = _blades[i].conj();
          }
          result->prune();
          return *result;
-
       }
 
       std::string toString() const {
          std::stringstream ss;
-         bool beg = true;
 
          if (_blades.empty()) {
             ss << "0";
          } else {
-            //sort(_blades.begin(),_blades.end());
-            blades_t::const_iterator i;
-            for (i = _blades.begin(); i != _blades.end(); i++) {
-               if (!beg) {
+            blades_t blades = _blades;
+            sort(blades.begin(),blades.end());
+            for (std::size_t i = 0; i < blades.size(); i++) {
+               if (i) {
                   ss << " ";
-                  if (i->get() >= 0) {
+                  if (blades[i].get() >= 0) {
                      ss << "+";
                   }
                }
-               beg = false;
-               ss << *i;
+               ss << blades[i];
             }
          }
          return ss.str();
@@ -337,10 +292,9 @@ typedef std::vector<Blade> blades_t;
       Mvec operator[] (const unsigned int nIndex) const {
         Mvec result;
 
-        blades_t::const_iterator i;
-        for(i=_blades.begin();i!=_blades.end();i++) {
-            if(i->grade()== nIndex) {
-                result._blades.push_back(*i);
+        for(std::size_t i=0;i<_blades.size();i++) {
+            if(_blades[i].grade()== nIndex) {
+                result._blades.push_back(_blades[i]);
             }
         }
         return result;
@@ -360,7 +314,6 @@ typedef std::vector<Blade> blades_t;
          }
           
          blades_t unique;
-         //blades_t duplicates;
          
          unique.push_back(_blades[0]);
          
@@ -369,7 +322,6 @@ typedef std::vector<Blade> blades_t;
              blades_t::iterator bi = std::find(unique.begin(),unique.end(),*b);
              if(bi != unique.end()) {
                  bi->set(bi->get()+b->get());
-                 //duplicates.push_back(*b);
              } else {
                  unique.push_back(*b);
              }
@@ -393,47 +345,6 @@ typedef std::vector<Blade> blades_t;
          } else {
              _blades.insert(_blades.end(),unique_nonzero.begin(),unique_nonzero.end());
          }
-         
-          /*
-         blades_t::iterator i;
-         blades_t::iterator j;
-         blades_t::iterator k;
-
-         i = this->_blades.begin();
-
-         while (i != this->_blades.end()) {
-            double v = i->get();
-            if (v < GCA_PRECISION && v > (-GCA_PRECISION)) {
-               k = i;
-               k++;
-               this->_blades.erase(i);
-               i = k;
-               continue;
-            }
-
-            j = i;
-            j++;
-            while (j != this->_blades.end()) {
-               if ((*i) == (*j)) {
-                  i->set(i->get() + j->get());
-                  k = j;
-                  k++;
-                  this->_blades.erase(j);
-                  j = k;
-               } else {
-                  j++;
-               }
-            }
-            v = i->get();
-            if (v < GCA_PRECISION && v > (-GCA_PRECISION)) {
-               k = i;
-               k++;
-               this->_blades.erase(i);
-               i = k;
-            } else {
-               i++;
-            }
-         }*/
       }
 
       blades_t _blades;
