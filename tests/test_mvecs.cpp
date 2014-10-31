@@ -6,11 +6,17 @@
 #include <string>
 #include <sstream>
 #include <ctime>
+#include <sys/time.h>
 
 using namespace std;
 using namespace gca;
 
-const unsigned int numTests = 10;
+const unsigned int numTests = 5;
+
+double timediff(struct timeval &start, struct timeval &end) {
+   return ((end.tv_sec - start.tv_sec) * 1000000u +
+           end.tv_usec - start.tv_usec) / 1.e6;
+}
 
 int main(int argc, char **argv) {
 
@@ -20,15 +26,14 @@ int main(int argc, char **argv) {
    srand(1);
    
    for (unsigned int i = 0; i < numTests; i++) {
-      mvecs.push_back(generate_mvec(5,4));
+      mvecs.push_back(generate_mvec(100,58));
    }
 
    for (size_t i = 0; i < mvecs.size(); i++) {
       for (size_t ii = 0; ii < mvecs.size(); ii++) {
          double elapsed_secs = 0;
 
-               clock_t begin;
-               clock_t end;
+               struct timeval start, end;
 
                Mvec A = mvecs[i];
                Mvec B = mvecs[ii];
@@ -36,66 +41,67 @@ int main(int argc, char **argv) {
                Mvec nB = ~B;
                Mvec C;
 
-               begin = clock();
+               gettimeofday(&start, NULL);
                C = A&B;
-               end = clock();
-               elapsed_secs += double(end - begin);
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);
 
-               cout << "(" << A << ")&(" << B << ")=" << C << endl;
+               //cout << "(" << A << ")&(" << B << ")=" << C << endl;
 
-               begin = clock();
+               gettimeofday(&start, NULL);
                C = A&nB;
-               end = clock();
-               elapsed_secs += double(end - begin);
-               cout << "(" << A << ")&~(" << B << ")=" << C << endl;
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);
 
-               begin = clock();
+               //cout << "(" << A << ")&~(" << B << ")=" << C << endl;
+
+               gettimeofday(&start, NULL);
                C = A^B;
-               end = clock();
-               elapsed_secs += double(end - begin);
-               cout << "(" << A << ")^(" << B << ")=" << C << endl;
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);
+               //cout << "(" << A << ")^(" << B << ")=" << C << endl;
 
-               begin = clock();
+               gettimeofday(&start, NULL);
                C = A^nB;
-               end = clock();
-               elapsed_secs += double(end - begin);
-               cout << "(" << A << ")^~(" << B << ")=" << C << endl;
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);
+               //cout << "(" << A << ")^~(" << B << ")=" << C << endl;
 
-               begin = clock();
+               gettimeofday(&start, NULL);
                C = A*B;
-               end = clock();
-               elapsed_secs += double(end - begin);
-               cout << "(" << A << ")*(" << B << ")=" << C << endl;
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);
+               //cout << "(" << A << ")*(" << B << ")=" << C << endl;
                
-               begin = clock();
+               gettimeofday(&start, NULL);
                C = A+nB;
-               end = clock();
-               elapsed_secs += double(end - begin);
-               cout << "(" << A << ")*(" << B << ")=" << C << endl;
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);
+               //cout << "(" << A << ")*(" << B << ")=" << C << endl;
                
-               begin = clock();
+               gettimeofday(&start, NULL);
                C = A+B;
-               end = clock();
-               elapsed_secs += double(end - begin);
-               cout << "(" << A << ")+(" << B << ")=" << C << endl;
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);
+               //cout << "(" << A << ")+(" << B << ")=" << C << endl;
                
-               begin = clock();
+               gettimeofday(&start, NULL);
                C = A+nB;
-               end = clock();
-               elapsed_secs += double(end - begin);
-               cout << "(" << A << ")+~(" << B << ")=" << C << endl;
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);               
+               //cout << "(" << A << ")+~(" << B << ")=" << C << endl;
 
-               begin = clock();
+               gettimeofday(&start, NULL);
                C = A-B;
-               end = clock();
-               elapsed_secs += double(end - begin);
-               cout << "(" << A << ")-(" << B << ")=" << C << endl;
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);
+               //cout << "(" << A << ")-(" << B << ")=" << C << endl;
 
-               begin = clock();
+               gettimeofday(&start, NULL);
                C = A-nB;
-               end = clock();
-               elapsed_secs += double(end - begin);
-               cout << "(" << A << ")-~(" << B << ")=" << C << endl;
+               gettimeofday(&end, NULL);
+               elapsed_secs += timediff(start,end);
+               //cout << "(" << A << ")-~(" << B << ")=" << C << endl;
                
                //cout << "#-----------------------------------------------" << endl;
          //cout << "Time taken " << elapsed_secs / CLOCKS_PER_SEC << " s." << endl;
@@ -105,7 +111,7 @@ int main(int argc, char **argv) {
    }
 
    cout << "#-----------------------------------------------" << endl;
-   cout << "Total time taken " << tot_time / CLOCKS_PER_SEC << " s." << endl << endl;
+   printf("Total time taken %.1fs\n", tot_time);
    cout << "#-----------------------------------------------" << endl;
 
    return 0;

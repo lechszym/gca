@@ -89,7 +89,7 @@ typedef std::vector<Blade> blades_t;
          Mvec *result = new Mvec(N);
 
 #ifdef OMP_ENABLED         
-#pragma omp parallel for shared(result,a,b)
+#pragma omp parallel for
 #endif
          for(std::size_t n=0;n<N;n++) {
             std::size_t ia = n/Nb;
@@ -109,7 +109,7 @@ typedef std::vector<Blade> blades_t;
          Mvec *result = new Mvec(N);
 
 #ifdef OMP_ENABLED         
-#pragma omp parallel for shared(result,a,b)
+#pragma omp parallel for
 #endif
          for(std::size_t n=0;n<N;n++) {
             std::size_t ia = n/Nb;
@@ -129,7 +129,7 @@ typedef std::vector<Blade> blades_t;
          Mvec *result = new Mvec(2*N);
 
 #ifdef OMP_ENABLED         
-#pragma omp parallel for shared(result,a,b)
+#pragma omp parallel for
 #endif
          for(std::size_t n=0;n<N;n++) {
             std::size_t ia = n/Nb;
@@ -309,6 +309,8 @@ typedef std::vector<Blade> blades_t;
    protected:
 
       void prune() {
+         return;
+
          if(_blades.size() < 2) {
              return;
          }
