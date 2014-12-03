@@ -51,6 +51,7 @@ typedef std::vector<Blade> blades_t;
 
       Mvec(const blades_t& blades) {
          _blades = blades;
+         this->prune();
       }
 
 #ifdef EIGEN_ENABLED
@@ -96,7 +97,6 @@ typedef std::vector<Blade> blades_t;
             std::size_t ib = n%Nb;
             result->_blades[n]= a->at(ia) & b->at(ib);
          }
-         result->prune();
          return *result;
       }
 
@@ -116,7 +116,6 @@ typedef std::vector<Blade> blades_t;
             std::size_t ib = n%Nb;
             result->_blades[n] = a->at(ia) ^ b->at(ib);
          }
-         result->prune();
          return *result;
       }
 
@@ -137,7 +136,6 @@ typedef std::vector<Blade> blades_t;
             result->_blades[n*2] = a->at(ia) & b->at(ib);
             result->_blades[n*2+1] = a->at(ia) ^ b->at(ib);
          }
-         result->prune();
          return *result;
       }
 
@@ -146,7 +144,6 @@ typedef std::vector<Blade> blades_t;
          for (std::size_t i = 0; i < result->_blades.size(); i++) {
             result->_blades[i].set(result->_blades[i].get() * x);
          }
-         result->prune();
          return *result;
       }
 
@@ -155,7 +152,6 @@ typedef std::vector<Blade> blades_t;
          for (std::size_t i = 0; i < result->_blades.size(); i++) {
             result->_blades[i].set(result->_blades[i].get() / x);
          }
-         result->prune();
          return *result;
       }
 
@@ -163,7 +159,6 @@ typedef std::vector<Blade> blades_t;
          double mMag = m.mag();
          Mvec mInv = m.conj();
          Mvec *result = new Mvec(this->mul(mInv.div(mMag)));
-         result->prune();
          return *result;
       }
 
@@ -212,26 +207,26 @@ typedef std::vector<Blade> blades_t;
          for (std::size_t i = 0; i < _blades.size(); i++) {
             result->_blades[i] = _blades[i].conj();
          }
-         result->prune();
          return *result;
       }
 
-      std::string toString() const {
+      std::string toString() {
          std::stringstream ss;
 
          if (_blades.empty()) {
             ss << "0";
          } else {
-            blades_t blades = _blades;
-            sort(blades.begin(),blades.end());
-            for (std::size_t i = 0; i < blades.size(); i++) {
+            this->prune();
+            //blades_t blades = _blades;
+            sort(_blades.begin(),_blades.end());
+            for (std::size_t i = 0; i < _blades.size(); i++) {
                if (i) {
                   ss << " ";
-                  if (blades[i].get() >= 0) {
+                  if (_blades[i].get() >= 0) {
                      ss << "+";
                   }
                }
-               ss << blades[i];
+               ss << _blades[i];
             }
          }
          return ss.str();
@@ -277,6 +272,10 @@ typedef std::vector<Blade> blades_t;
          return this->sub(x);
       }
 
+      Mvec operator-() const  {
+         return (Mvec()-(*this));
+      }      
+      
       Mvec& operator=(const Mvec& m) {
          if (this != &m) {
             _blades = m._blades;
@@ -297,11 +296,45 @@ typedef std::vector<Blade> blades_t;
                 result._blades.push_back(_blades[i]);
             }
         }
+        result.prune();
         return result;
       }
      
+      bool operator==(Mvec& m) {
 
-      friend std::ostream& operator<<(std::ostream &out, const Mvec &v) {
+         this->prune();
+         m.prune();
+
+         if (_blades.size() != m._blades.size()) {
+            return false;
+         }
+         
+         sort(_blades.begin(),_blades.end());
+         sort(m._blades.begin(),m._blades.end()); 
+
+
+         for(std::size_t i=0;i<_blades.size();i++) {
+             double vA = _blades[i].get();
+             double vB = m._blades[i].get();
+             
+             if(vA > vB+GCA_PRECISION) {
+                return false;
+             }
+             
+             if(vA < vB-GCA_PRECISION) {
+                return false;
+             }
+             
+             if( !(_blades[i] == m._blades[i]) ) {
+                return false;
+             }
+         }
+
+         return true;
+      }
+      
+      
+      friend std::ostream& operator<<(std::ostream &out, Mvec &v) {
          out << v.toString();
          return out;
       }
@@ -309,7 +342,6 @@ typedef std::vector<Blade> blades_t;
    protected:
 
       void prune() {
-         return;
 
          if(_blades.size() < 2) {
              return;
