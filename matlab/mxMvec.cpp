@@ -134,7 +134,7 @@ mxArray *mxMvec::convert2mxArray(void) {
         mexErrMsgTxt("Failed to allocate memory for mvec cell!");
     }
     
-    std::list<Blade>::iterator i;
+    blades_t::iterator i;
     mwIndex cindx=0;
     
     for(i=_blades.begin();i!=_blades.end();i++) {

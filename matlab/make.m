@@ -1,5 +1,5 @@
 function make
 
-mex -output gcamvec -v -I../gca -I../src gcamvec.cpp mxMvec.cpp
+mex -largeArrayDims CXXFLAGS="\$CXXFLAGS -std=c++11" -output gcamvec -v -I../gca -I../src gcamvec.cpp mxMvec.cpp
 
 end
