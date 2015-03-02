@@ -12,12 +12,17 @@ int main(int argc, char **argv) {
    
    Blade c1 = b1&b3;
 
-   cout << c1 << endl;
+   cout << b1 << " & " << b2 << " = " << c1 << endl;
    
-   c1 = b1^b3;
+   c1 = b3^b1;
    
-   cout << c1 << endl;
-   cout << c1.inv() << endl;
+   cout << "c1 = " << b3 << " ^ " << b1 << " = " << c1 << endl;
+   
+   Blade d=c1.inv();
+   cout << "c1 inv = " << d << endl;
+   
+   cout << "c1 & c1inv = " << (c1&d) << endl;
+   cout << "c1 ^ c1inv = " << (c1^d) << endl;
    
    Blade c3 = c1&b2;
    
