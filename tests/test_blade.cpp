@@ -7,6 +7,7 @@ using namespace gca;
 int main(int argc, char **argv) {
 
    Blade b1(2,1);
+   
    Blade b2(3,2);
    Blade b3(-1,3);
    

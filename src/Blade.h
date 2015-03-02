@@ -103,6 +103,7 @@ public:
             iB++;
             eB_iter++;
          } else {
+            iA--;
             unsigned int flip = iA % 2;
             if (flip != 0) {
                sign *= -1;

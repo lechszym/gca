@@ -8,6 +8,35 @@ using namespace gca;
 int main(int argc, char **argv) {
 
 #ifdef EIGEN_ENABLED    
+   Eigen::RowVectorXd n(2);
+   n << 1, 1;
+   Mvec m(n);
+   
+   cout << "m = " << m << endl;
+   
+   Mvec m2 = m*m;
+   cout << "m*m = " << m2 << endl;
+
+
+   Eigen::RowVectorXd ee1(2);
+   Eigen::RowVectorXd ee2(2);
+   ee1 << 1, 0;
+   ee2 << 0, 1;
+
+   Mvec e1(ee1);
+   Mvec e2(ee2);
+   
+   cout << "e1 = " << e1 << endl;
+   cout << "e2 = " << e1 << endl;
+   
+   Mvec e1we2 = e1^e2;
+   Mvec eww = e1we2*e1we2;
+   cout << "e1^e2 = " << e1we2 << endl;
+   cout << "e1^e2*e1^e2 = " << eww << endl;
+   
+
+   
+
    Eigen::RowVectorXd v(4);
    
    v << 1, 2, 3, 4;  

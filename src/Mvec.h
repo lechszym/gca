@@ -26,6 +26,9 @@
 namespace gca {
 
 typedef std::vector<Blade> blades_t;
+//using blades_t = typename std::vector<Blade<T> >::blades_t;
+
+
 
 #ifndef GCA_PRECISION
 #define GCA_PRECISION  1e-12
