@@ -15,7 +15,7 @@ const unsigned int numTests = 10;
 
 int main(int argc, char **argv) {
 
-   vector<Mvec> mvecs;
+   vector<Mvecd> mvecs;
 
    srand(1);
    
@@ -25,9 +25,9 @@ int main(int argc, char **argv) {
 
    for (size_t i = 0; i < mvecs.size(); i++) {
       
-      Mvec A = mvecs[i];
-      Mvec nA = ~A;
-      Mvec C,D;
+      Mvecd A = mvecs[i];
+      Mvecd nA = ~A;
+      Mvecd C,D;
       C = A*A;
       D = C[0];
       if( !(C == D)) {
@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
       }
       
       C = A/A;
-      D = Mvec(Blade(1));
+      D = Mvecd(Bladed(1));
       if( !(C == D)) {
          cout << "Error\n";
          return -1;
@@ -44,15 +44,15 @@ int main(int argc, char **argv) {
       
       for (size_t ii = 0; ii < mvecs.size(); ii++) {
 
-               Mvec B = mvecs[ii];
-               Mvec nB = ~B;
+               Mvecd B = mvecs[ii];
+               Mvecd nB = ~B;
                
-               Mvec AB = A*B;
-               Mvec BA = B*A;
-               Mvec AdB = A&B;
-               Mvec BdA = B&A;
-               Mvec AwB = A^B;
-               Mvec BwA = B^A;
+               Mvecd AB = A*B;
+               Mvecd BA = B*A;
+               Mvecd AdB = A&B;
+               Mvecd BdA = B&A;
+               Mvecd AwB = A^B;
+               Mvecd BwA = B^A;
                
                C = (AB+BA)*0.5;
                if( !(C == AdB) ) {

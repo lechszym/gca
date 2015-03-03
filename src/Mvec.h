@@ -25,57 +25,47 @@
 
 namespace gca {
 
-typedef std::vector<Blade> blades_t;
-//using blades_t = typename std::vector<Blade<T> >::blades_t;
-
-
 
 #ifndef GCA_PRECISION
 #define GCA_PRECISION  1e-12
 #endif
 
+   template <typename T>
    class Mvec {
    public:
 
       Mvec() {
       }
 
-      Mvec(const Blade &b) {
+      Mvec(const Blade<T> &b) {
          _blades.push_back(b);
       }
 
       Mvec(std::size_t N) {
-         _blades = blades_t(N);
+         _blades = std::vector<Blade<T> >(N);
       }
 
       Mvec(double v, unsigned long e) {
-         _blades.push_back(Blade(v,e));
+         _blades.push_back(Blade<T>(v,e));
       }
 
-      Mvec(const blades_t& blades) {
+      Mvec(const std::vector<Blade<T> >& blades) {
          _blades = blades;
          this->prune();
       }
 
 #ifdef EIGEN_ENABLED
 
-      Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
-         _blades = blades_t(v.size());
-         for (unsigned int i = 0; i < v.size(); i++) {
-            _blades[i] = Blade(v(i, 0), i + 1);
-         }
-         this->prune();
-      }
+   Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
 
-      Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
-         _blades = blades_t(v.size());
-         for (unsigned int i = 0; i < v.size(); i++) {
-            _blades[i] = Blade(v(0, i), i + 1);
-         }
-         this->prune();
-      }
-#endif
+   }
 
+   Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
+
+   }
+      
+#endif      
+      
       Mvec(const Mvec& orig) {
          _blades = orig._blades;
       }
@@ -85,8 +75,8 @@ typedef std::vector<Blade> blades_t;
       }
 
       Mvec& inner(const Mvec &m) const {
-         const blades_t *a = &_blades;
-         const blades_t *b = &m._blades;        
+         const std::vector<Blade<T> > *a = &_blades;
+         const std::vector<Blade<T> > *b = &m._blades;        
          std::size_t Na = a->size();
          std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
@@ -104,8 +94,8 @@ typedef std::vector<Blade> blades_t;
       }
 
       Mvec& outer(const Mvec &m) const {
-         const blades_t *a = &_blades;
-         const blades_t *b = &m._blades;        
+         const std::vector<Blade<T> > *a = &_blades;
+         const std::vector<Blade<T> > *b = &m._blades;        
          std::size_t Na = a->size();
          std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
@@ -123,8 +113,8 @@ typedef std::vector<Blade> blades_t;
       }
 
       Mvec& mul(const Mvec &m) const {
-         const blades_t *a = &_blades;
-         const blades_t *b = &m._blades;        
+         const std::vector<Blade<T> > *a = &_blades;
+         const std::vector<Blade<T> > *b = &m._blades;        
          std::size_t Na = a->size();
          std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
@@ -220,7 +210,7 @@ typedef std::vector<Blade> blades_t;
             ss << "0";
          } else {
             this->prune();
-            //blades_t blades = _blades;
+            //std::vector<Blade<T> > blades = _blades;
             sort(_blades.begin(),_blades.end());
             for (std::size_t i = 0; i < _blades.size(); i++) {
                if (i) {
@@ -350,13 +340,13 @@ typedef std::vector<Blade> blades_t;
              return;
          }
           
-         blades_t unique;
+         std::vector<Blade<T> > unique;
          
          unique.push_back(_blades[0]);
          
          for(std::size_t i=1;i<_blades.size();i++) {
-             Blade *b = &_blades[i];
-             blades_t::iterator bi = std::find(unique.begin(),unique.end(),*b);
+             Blade<T> *b = &_blades[i];
+             typename std::vector<Blade<T> >::iterator bi = std::find(unique.begin(),unique.end(),*b);
              if(bi != unique.end()) {
                  bi->set(bi->get()+b->get());
              } else {
@@ -364,10 +354,10 @@ typedef std::vector<Blade> blades_t;
              }
          }
          
-         blades_t unique_nonzero;
+         std::vector<Blade<T> > unique_nonzero;
          
          for(std::size_t i=0;i<unique.size();i++) {
-             Blade *b = &unique[i];
+             Blade<T> *b = &unique[i];
              double v = b->get();
 
              if (v > GCA_PRECISION || v < (-GCA_PRECISION)) {
@@ -378,15 +368,37 @@ typedef std::vector<Blade> blades_t;
          
          _blades.clear();
          if(unique_nonzero.empty()) {
-             _blades.push_back(Blade(0));
+             _blades.push_back(Blade<T>(0));
          } else {
              _blades.insert(_blades.end(),unique_nonzero.begin(),unique_nonzero.end());
          }
       }
 
-      blades_t _blades;
+      std::vector<Blade<T> > _blades;
       
    };
+   
+#ifdef EIGEN_ENABLED
+
+   template<> inline
+   Mvec<double>::Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
+         _blades = std::vector<Blade<double> >(v.size());
+         for (unsigned int i = 0; i < v.size(); i++) {
+            _blades[i] = Blade<double>(v(i, 0), i + 1);
+         }
+         this->prune();
+   }
+
+   template<> inline
+   Mvec<double>::Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
+         _blades = std::vector<Blade<double> >(v.size());
+         for (unsigned int i = 0; i < v.size(); i++) {
+            _blades[i] = Blade<double>(v(0, i), i + 1);
+         }
+         this->prune();
+   }
+#endif
+   
 }
 
 #endif	/* MVEC_H */

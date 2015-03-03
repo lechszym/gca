@@ -1,1 +1,17 @@
 #include "../src/Mvec.h"
+
+namespace gca {
+
+    typedef Blade<int> Bladei;
+    typedef Mvec<int>  Mveci;
+
+    typedef Blade<long> Bladel;
+    typedef Mvec<long>  Mvecl;
+
+    typedef Blade<float> Bladef;
+    typedef Mvec<float>  Mvecf;
+    
+    typedef Blade<double> Bladed;
+    typedef Mvec<double>  Mvecd;
+    
+}

@@ -21,7 +21,7 @@ double timediff(struct timeval &start, struct timeval &end) {
 int main(int argc, char **argv) {
 
    double tot_time = 0;
-   vector<Mvec> mvecs;
+   vector<Mvecd> mvecs;
 
    srand(1);
    
@@ -35,11 +35,11 @@ int main(int argc, char **argv) {
 
                struct timeval start, end;
 
-               Mvec A = mvecs[i];
-               Mvec B = mvecs[ii];
-               Mvec nA = ~A;
-               Mvec nB = ~B;
-               Mvec C;
+               Mvecd A = mvecs[i];
+               Mvecd B = mvecs[ii];
+               Mvecd nA = ~A;
+               Mvecd nB = ~B;
+               Mvecd C;
 
                gettimeofday(&start, NULL);
                C = A&B;

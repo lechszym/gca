@@ -12,6 +12,7 @@ namespace gca
 
 typedef std::vector<unsigned long> ebase_t;
 
+template <typename T>
 class Blade {
 public:
 
@@ -328,70 +329,9 @@ public:
 
 private:
 
-   /*ebase_t& emult(const ebase_t &eA,
-           const ebase_t &eB,
-           int *sign,
-           bool *common) const {
-
-      bool outer = *common;
-      *common = false;
-      
-      ebase_t *eC = new ebase_t();
-      eC->reserve(eA.size() + eB.size());
-
-      unsigned int iA = eA.size();
-
-      *sign = 1;
-
-      ebase_t::const_iterator eA_iter = eA.begin();
-      ebase_t::const_iterator eB_iter = eB.begin();
-
-      while (true) {
-         if (eA_iter == eA.end()) {
-            eC->insert(eC->end(), eB_iter, eB.end());
-            break;
-         } else if (eB_iter == eB.end()) {
-            eC->insert(eC->end(), eA_iter, eA.end());
-            break;
-         } else if (*eA_iter < *eB_iter) {
-            eC->push_back(*eA_iter);
-            iA--;
-            eA_iter++;
-         } else if (*eB_iter < *eA_iter) {
-            unsigned int flip = iA % 2;
-            if (flip != 0) {
-               *sign = -(*sign);
-            } 
-            eC->push_back(*eB_iter);
-            eB_iter++;
-         } else {
-            *common = true;
-            if (outer) {
-                eC->clear();
-                break;
-            }
-            if(iA) {
-                unsigned int flip = --iA % 2;
-                if (flip != 0) {
-                   *sign = -(*sign);
-                }
-            }
-            eA_iter++;
-            eB_iter++;
-         }
-      }
-
-      // If doing inner product, then we're done - it will be zero
-      if(!outer && !(*common)) {
-          eC->clear();
-      }
-
-      return *eC;      
-   }*/
-
 protected:
    ebase_t _e;
-   double _v;
+   T _v;
 
 };
 }
