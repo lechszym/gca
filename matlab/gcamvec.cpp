@@ -26,7 +26,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
                help();
            }
 
-           mxMvec m(prhs[1]);
+           mxMvec<double> m(prhs[1]);
            plhs[0] = m.convert2mxArray();
            break;
        
@@ -41,10 +41,10 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
                help();
            }
 
-           mxMvec a(prhs[1]);
+           mxMvec<double> a(prhs[1]);
            double *grade = mxGetPr(prhs[2]);
            
-           mxMvec b = a[(unsigned int) (*grade)];
+           mxMvec<double> b = a[(unsigned int) (*grade)];
            plhs[0] = b.convert2mxArray();
            break;
        }
@@ -59,9 +59,9 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
                help();
            }
        
-           mxMvec a(prhs[1]);
-           mxMvec b(prhs[2]);
-           mxMvec c;
+           mxMvec<double> a(prhs[1]);
+           mxMvec<double> b(prhs[2]);
+           mxMvec<double> c;
            
            switch(*cmd) {
             case '&': 
@@ -99,8 +99,8 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
                help();
            }
            
-           mxMvec a(prhs[1]);
-           mxMvec b = ~a;
+           mxMvec<double> a(prhs[1]);
+           mxMvec<double> b = ~a;
            plhs[0] = b.convert2mxArray();         
            break;
        }       
@@ -115,7 +115,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
                help();
            }
            
-           mxMvec a(prhs[1]);
+           mxMvec<double> a(prhs[1]);
            if(nrhs > 2) {
                 double *dim = mxGetPr(prhs[2]);
                 plhs[0] = a.matVec((unsigned int) *dim);                        
@@ -135,7 +135,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
                help();
            }
            
-           mxMvec m(prhs[1]);
+           mxMvec<double> m(prhs[1]);
            cout << m << endl;
            break;
        }        
