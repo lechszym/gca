@@ -46,7 +46,7 @@ namespace gca {
       }
 
       Mvec(double v, unsigned long e) {
-         _blades.push_back(Blade<T>(v,e));
+         _blades.push_back(Blade<T>(v, e));
       }
 
       Mvec(const std::vector<Blade<T> >& blades) {
@@ -56,16 +56,16 @@ namespace gca {
 
 #ifdef EIGEN_ENABLED
 
-   Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
+      Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
 
-   }
+      }
 
-   Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
+      Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
 
-   }
-      
+      }
+
 #endif      
-      
+
       Mvec(const Mvec& orig) {
          _blades = orig._blades;
       }
@@ -76,7 +76,7 @@ namespace gca {
 
       Mvec& inner(const Mvec &m) const {
          const std::vector<Blade<T> > *a = &_blades;
-         const std::vector<Blade<T> > *b = &m._blades;        
+         const std::vector<Blade<T> > *b = &m._blades;
          std::size_t Na = a->size();
          std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
@@ -85,17 +85,17 @@ namespace gca {
 #ifdef OMP_ENABLED         
 #pragma omp parallel for
 #endif
-         for(std::size_t n=0;n<N;n++) {
-            std::size_t ia = n/Nb;
-            std::size_t ib = n%Nb;
-            result->_blades[n]= a->at(ia) & b->at(ib);
+         for (std::size_t n = 0; n < N; n++) {
+            std::size_t ia = n / Nb;
+            std::size_t ib = n % Nb;
+            result->_blades[n] = a->at(ia) & b->at(ib);
          }
          return *result;
       }
 
       Mvec& outer(const Mvec &m) const {
          const std::vector<Blade<T> > *a = &_blades;
-         const std::vector<Blade<T> > *b = &m._blades;        
+         const std::vector<Blade<T> > *b = &m._blades;
          std::size_t Na = a->size();
          std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
@@ -104,9 +104,9 @@ namespace gca {
 #ifdef OMP_ENABLED         
 #pragma omp parallel for
 #endif
-         for(std::size_t n=0;n<N;n++) {
-            std::size_t ia = n/Nb;
-            std::size_t ib = n%Nb;
+         for (std::size_t n = 0; n < N; n++) {
+            std::size_t ia = n / Nb;
+            std::size_t ib = n % Nb;
             result->_blades[n] = a->at(ia) ^ b->at(ib);
          }
          return *result;
@@ -114,20 +114,20 @@ namespace gca {
 
       Mvec& mul(const Mvec &m) const {
          const std::vector<Blade<T> > *a = &_blades;
-         const std::vector<Blade<T> > *b = &m._blades;        
+         const std::vector<Blade<T> > *b = &m._blades;
          std::size_t Na = a->size();
          std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
-         Mvec *result = new Mvec(2*N);
+         Mvec *result = new Mvec(2 * N);
 
 #ifdef OMP_ENABLED         
 #pragma omp parallel for
 #endif
-         for(std::size_t n=0;n<N;n++) {
-            std::size_t ia = n/Nb;
-            std::size_t ib = n%Nb;
-            result->_blades[n*2] = a->at(ia) & b->at(ib);
-            result->_blades[n*2+1] = a->at(ia) ^ b->at(ib);
+         for (std::size_t n = 0; n < N; n++) {
+            std::size_t ia = n / Nb;
+            std::size_t ib = n % Nb;
+            result->_blades[n * 2] = a->at(ia) & b->at(ib);
+            result->_blades[n * 2 + 1] = a->at(ia) ^ b->at(ib);
          }
          return *result;
       }
@@ -211,7 +211,7 @@ namespace gca {
          } else {
             this->prune();
             //std::vector<Blade<T> > blades = _blades;
-            sort(_blades.begin(),_blades.end());
+            sort(_blades.begin(), _blades.end());
             for (std::size_t i = 0; i < _blades.size(); i++) {
                if (i) {
                   ss << " ";
@@ -265,10 +265,10 @@ namespace gca {
          return this->sub(x);
       }
 
-      Mvec operator-() const  {
+      Mvec operator-() const {
          return (Mvec()-(*this));
-      }      
-      
+      }
+
       Mvec& operator=(const Mvec& m) {
          if (this != &m) {
             _blades = m._blades;
@@ -278,21 +278,21 @@ namespace gca {
       }
 
       Mvec& operator~(void) {
-        return this->conj();
+         return this->conj();
       }
-      
-      Mvec operator[] (const unsigned int nIndex) const {
-        Mvec result;
 
-        for(std::size_t i=0;i<_blades.size();i++) {
-            if(_blades[i].grade()== nIndex) {
-                result._blades.push_back(_blades[i]);
+      Mvec operator[](const unsigned int nIndex) const {
+         Mvec result;
+
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            if (_blades[i].grade() == nIndex) {
+               result._blades.push_back(_blades[i]);
             }
-        }
-        result.prune();
-        return result;
+         }
+         result.prune();
+         return result;
       }
-     
+
       bool operator==(Mvec& m) {
 
          this->prune();
@@ -301,32 +301,31 @@ namespace gca {
          if (_blades.size() != m._blades.size()) {
             return false;
          }
-         
-         sort(_blades.begin(),_blades.end());
-         sort(m._blades.begin(),m._blades.end()); 
+
+         sort(_blades.begin(), _blades.end());
+         sort(m._blades.begin(), m._blades.end());
 
 
-         for(std::size_t i=0;i<_blades.size();i++) {
-             double vA = _blades[i].get();
-             double vB = m._blades[i].get();
-             
-             if(vA > vB+GCA_PRECISION) {
-                return false;
-             }
-             
-             if(vA < vB-GCA_PRECISION) {
-                return false;
-             }
-             
-             if( !(_blades[i] == m._blades[i]) ) {
-                return false;
-             }
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            double vA = _blades[i].get();
+            double vB = m._blades[i].get();
+
+            if (vA > vB + GCA_PRECISION) {
+               return false;
+            }
+
+            if (vA < vB - GCA_PRECISION) {
+               return false;
+            }
+
+            if (!(_blades[i] == m._blades[i])) {
+               return false;
+            }
          }
 
          return true;
       }
-      
-      
+
       friend std::ostream& operator<<(std::ostream &out, Mvec &v) {
          out << v.toString();
          return out;
@@ -336,69 +335,69 @@ namespace gca {
 
       void prune() {
 
-         if(_blades.size() < 2) {
-             return;
+         if (_blades.size() < 2) {
+            return;
          }
-          
-         std::vector<Blade<T> > unique;
-         
-         unique.push_back(_blades[0]);
-         
-         for(std::size_t i=1;i<_blades.size();i++) {
-             Blade<T> *b = &_blades[i];
-             typename std::vector<Blade<T> >::iterator bi = std::find(unique.begin(),unique.end(),*b);
-             if(bi != unique.end()) {
-                 bi->set(bi->get()+b->get());
-             } else {
-                 unique.push_back(*b);
-             }
-         }
-         
-         std::vector<Blade<T> > unique_nonzero;
-         
-         for(std::size_t i=0;i<unique.size();i++) {
-             Blade<T> *b = &unique[i];
-             double v = b->get();
 
-             if (v > GCA_PRECISION || v < (-GCA_PRECISION)) {
-                 unique_nonzero.push_back(*b);
-                 
-             }
+         std::vector<Blade<T> > unique;
+
+         unique.push_back(_blades[0]);
+
+         for (std::size_t i = 1; i < _blades.size(); i++) {
+            Blade<T> *b = &_blades[i];
+            typename std::vector<Blade<T> >::iterator bi = std::find(unique.begin(), unique.end(), *b);
+            if (bi != unique.end()) {
+               bi->set(bi->get() + b->get());
+            } else {
+               unique.push_back(*b);
+            }
          }
-         
+
+         std::vector<Blade<T> > unique_nonzero;
+
+         for (std::size_t i = 0; i < unique.size(); i++) {
+            Blade<T> *b = &unique[i];
+            double v = b->get();
+
+            if (v > GCA_PRECISION || v < (-GCA_PRECISION)) {
+               unique_nonzero.push_back(*b);
+
+            }
+         }
+
          _blades.clear();
-         if(unique_nonzero.empty()) {
-             _blades.push_back(Blade<T>(0));
+         if (unique_nonzero.empty()) {
+            _blades.push_back(Blade<T>(0));
          } else {
-             _blades.insert(_blades.end(),unique_nonzero.begin(),unique_nonzero.end());
+            _blades.insert(_blades.end(), unique_nonzero.begin(), unique_nonzero.end());
          }
       }
 
       std::vector<Blade<T> > _blades;
-      
+
    };
-   
+
 #ifdef EIGEN_ENABLED
 
    template<> inline
    Mvec<double>::Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
-         _blades = std::vector<Blade<double> >(v.size());
-         for (unsigned int i = 0; i < v.size(); i++) {
-            _blades[i] = Blade<double>(v(i, 0), i + 1);
-         }
-         this->prune();
+      _blades = std::vector<Blade<double> >(v.size());
+      for (unsigned int i = 0; i < v.size(); i++) {
+         _blades[i] = Blade<double>(v(i, 0), i + 1);
+      }
+      this->prune();
    }
 
    template<> inline
    Mvec<double>::Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
-         _blades = std::vector<Blade<double> >(v.size());
-         for (unsigned int i = 0; i < v.size(); i++) {
-            _blades[i] = Blade<double>(v(0, i), i + 1);
-         }
-         this->prune();
+      _blades = std::vector<Blade<double> >(v.size());
+      for (unsigned int i = 0; i < v.size(); i++) {
+         _blades[i] = Blade<double>(v(0, i), i + 1);
+      }
+      this->prune();
    }
 #endif
-   
+
 }
 
 #endif	/* MVEC_H */
