@@ -12,8 +12,9 @@ int main(int argc, char **argv) {
    BladeS b1(x1,1);
    BladeS b3(x3,3);
    
-   cout << b1 << endl;
-   cout << b3 << endl;
+   BladeS c = b1^b3;
+   
+   cout << b1 << " ^ " << b3 << " = " << c << endl;
    
    return 0;
 }

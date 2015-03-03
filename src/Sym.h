@@ -16,14 +16,16 @@ namespace gca {
    public:
 
       Sym() {
-         
+         _sign = 1;
       }
 
       Sym(const char s[]) {
+         _sign = 1;
          _sym = std::string(s);
       }
       
       Sym(const Sym& orig) {
+         _sign = orig._sign;
          _sym = orig._sym;
       }
 
@@ -39,6 +41,16 @@ namespace gca {
          return ss.str();
       }*/
       
+      Sym operator*(const Sym& m) const {
+         return Sym(m);
+      }
+
+      Sym operator*(const int x) const {
+         Sym m = Sym(*this);
+         m._sign *= x;
+         return m;
+      }
+      
       friend std::ostream& operator<<(std::ostream &out, const Sym &s) {      
          out << s._sym;
          return out;      
@@ -46,6 +58,7 @@ namespace gca {
    
    private:
       std::string _sym;
+      int         _sign;
       
    };
    
