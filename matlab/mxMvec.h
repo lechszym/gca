@@ -11,7 +11,7 @@
 #include "mex.h"
 #include <Mvec>
 
-class mxMvec : public gca::Mvec {
+class mxMvec : public gca::Mvecd {
 public:
     mxMvec();
     //mxMvec(const char *eStr,unsigned int dim=0);
@@ -23,8 +23,8 @@ public:
     mxArray* matVec(unsigned int dim);         
 
 private:
-    static mxArray* Blade2mxArray(const gca::Blade &b);
-    static gca::Blade&   mxArray2Blade(const mxArray *mxb);
+    static mxArray* Blade2mxArray(const gca::Bladed &b);
+    static gca::Bladed&   mxArray2Blade(const mxArray *mxb);
     
 };
 

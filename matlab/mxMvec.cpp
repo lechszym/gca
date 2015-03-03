@@ -9,7 +9,7 @@
 
 using namespace gca;
 
-mxMvec::mxMvec() : Mvec() {
+mxMvec::mxMvec() : Mvecd() {
 
 }   
 
@@ -44,24 +44,24 @@ mxMvec::mxMvec(const mxArray *a) {
         double *v = mxGetPr(a);        
 
         if(L==1) {
-            _blades.push_back(Blade(*v));
+            _blades.push_back(Bladed(*v));
         } else {
             for(size_t l=0;l<L;l++) {
-                _blades.push_back(Blade(*v++,l+1));        
+                _blades.push_back(Bladed(*v++,l+1));        
             }
         }
         this->prune();
     }
 }
 
-mxMvec::mxMvec(const Mvec& orig) : Mvec(orig) {
+mxMvec::mxMvec(const Mvecd& orig) : Mvecd(orig) {
     
 }
 
 //::~mxMvec() {
 //}
 
-mxArray *mxMvec::Blade2mxArray(const Blade &b) {
+mxArray *mxMvec::Blade2mxArray(const Bladed &b) {
 
     const char *BfieldNames[] = {"grade", "v", "e"};
     mwSize Bdims[2] = {1, 1};
@@ -95,7 +95,7 @@ mxArray *mxMvec::Blade2mxArray(const Blade &b) {
     return smxB;
 }
 
-Blade& mxMvec::mxArray2Blade(const mxArray *B) {
+Bladed& mxMvec::mxArray2Blade(const mxArray *B) {
     mxArray *mxA = mxGetField(B, 0, "grade");
     if (!mxA || !mxIsClass(mxA,"double")) {
         mexErrMsgTxt("Failed to read field 'grade'!");
@@ -122,7 +122,7 @@ Blade& mxMvec::mxArray2Blade(const mxArray *B) {
         e.push_back(*e_p++);
     }
 
-    return *(new Blade(v,e));
+    return *(new Bladed(v,e));
 }
 
 mxArray *mxMvec::convert2mxArray(void) {
@@ -134,7 +134,7 @@ mxArray *mxMvec::convert2mxArray(void) {
         mexErrMsgTxt("Failed to allocate memory for mvec cell!");
     }
     
-    blades_t::iterator i;
+    std::vector<Bladed>::iterator i;
     mwIndex cindx=0;
     
     for(i=_blades.begin();i!=_blades.end();i++) {
@@ -145,7 +145,7 @@ mxArray *mxMvec::convert2mxArray(void) {
 
 
 mxArray *mxMvec::matVec() {
-    blades_t::iterator i;
+    std::vector<Bladed>::iterator i;
     unsigned int dim = 0;
     for(i=_blades.begin();i!=_blades.end();i++) {
         if(i->grade()==1) {
@@ -166,7 +166,7 @@ mxArray *mxMvec::matVec(unsigned int dim){
     }
 
     double *v = mxGetPr(mxV);
-    blades_t::iterator i;
+    std::vector<Bladed>::iterator i;
     for(i=_blades.begin();i!=_blades.end();i++) {
         if(i->grade()==1) {
             unsigned int e = i->at(0);
