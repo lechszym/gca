@@ -30,6 +30,8 @@ namespace gca {
          _v = orig._v;
          _sym = orig._sym;
          _inv = orig._inv;
+         _mult = orig._mult;
+         _sum = orig._sum;
       }
 
       virtual ~Sym() {
@@ -45,30 +47,71 @@ namespace gca {
       }*/
       
       Sym operator*(const Sym& m) const {
-         return Sym(m);
+         Sym a(*this);
+         Sym b(m);
+
+         a._v *= b._v;
+         b._v = 1.0;
+         a._mult.push_back(b);
+         
+         for(std::size_t i=0;i<a._sum.size();i++) {
+            a._sum[i] = a._sum[i]*m;
+         }
+
+         for(std::size_t i=0;i<b._sum.size();i++) {
+            a._sum.push_back(b._sum[i]*(*this));
+         }
+         
+         return a;
       }
 
-      Sym operator*(const int x) const {
-         Sym m = Sym(*this);
-         m._v *= x;
-         return m;
-      }
-
-      int getSign() const {
-          int sign = 1;
-          if(_v < 0) {
-              sign *= -1;
-          }
-          for(std::size_t i=0;i<_mult.size();i++) {
-              sign *= _mult[i].getSign();
-          }
-          return sign;
+      Sym operator*(const double x) const {
+         Sym a = Sym(*this);
+         a._v *= x;
+         return a;
       }
       
+      Sym operator+(const Sym& m) const {
+         Sym a = Sym(*this);
+         a._sum.push_back(m);
+         return a;
+      }
+ 
       std::string toString() const {
         std::stringstream ss;
 
+        if(_inv) {
+           ss << "/";
+        }
+        
+        if(_v < 0.0) {
+           ss << "-";
+        }
+
+        if(!_sum.empty()) {
+           ss << "(";
+        }
+
+        if(std::abs(_v) != 1.0) {
+           ss << std::abs(_v);
+        }
+        
         ss << _sym;
+
+        for(std::size_t i=0;i<_mult.size();i++) {
+           ss << _mult[i];
+        } 
+        
+        for(std::size_t i=0;i<_sum.size();i++) {
+           if(_sum[i]._v > 0.0) {
+              ss << "+";
+           }
+           ss << _sum[i];
+        }
+        
+        if(!_sum.empty()) {
+           ss << ")";
+        }
         
         return ss.str();
         

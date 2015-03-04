@@ -11,10 +11,12 @@ int main(int argc, char **argv) {
    
    BladeS b1(x1,1);
    BladeS b3(x3,3);
+   BladeS b2(x1+x3,2);
    
-   BladeS c = b1^b3;
+   BladeS c = b2^b3;
    
-   cout << b1 << " ^ " << b3 << " = " << c << endl;
+   cout << b1 << " ^ " << b2 << " = " << c << endl;
+//   cout << "b1+b2=" << z << endl;
    
    return 0;
 }
