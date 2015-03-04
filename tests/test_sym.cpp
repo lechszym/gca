@@ -6,16 +6,28 @@ using namespace gca;
 
 int main(int argc, char **argv) {
 
-   Sym x1("x1");
-   Sym x3("x3");
+   vector<BladeS> bx;
+   vector<BladeS> bt;
+   char buff[32];
    
-   BladeS b1(x1,1);
-   BladeS b3(x3,3);
-   BladeS b2(x1+x3,2);
+   for(unsigned int i=0;i<3;i++) {
+       sprintf(buff,"x%d", i+1);
+       bx.push_back(BladeS(Sym(buff),i+1));       
+       sprintf(buff,"t%d", i+1);
+       bt.push_back(BladeS(Sym(buff),i+1));       
+   }
    
-   BladeS c = b2^b3;
+    
+   MvecS  x(bx);
+   MvecS  t(bt);
+   MvecS  I=MvecS::I(3);
    
-   cout << b1 << " ^ " << b2 << " = " << c << endl;
+   cout << "x = " << x << endl;
+   cout << "t = " << t << endl;
+   cout << "I = " << I << endl;
+
+   MvecS  z = x*t;
+   cout << "xt = " << z << endl;
 //   cout << "b1+b2=" << z << endl;
    
    return 0;

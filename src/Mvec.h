@@ -330,7 +330,22 @@ namespace gca {
          out << v.toString();
          return out;
       }
+      
+      static Mvec<T> pseudoscalar(unsigned int dim) {
+          T         v(1);
+          ebase_t   e;
+          
+          for(unsigned int i=1;i<=dim;i++) {
+              e.push_back(i);
+          }
 
+          return Mvec<T>(Blade<T>(v, e));
+      }
+
+      static Mvec<T> I(unsigned int dim) {
+          return Mvec<T>::pseudoscalar(dim);
+      }
+      
    protected:
 
       void prune() {
@@ -357,7 +372,7 @@ namespace gca {
 
          for (std::size_t i = 0; i < unique.size(); i++) {
             Blade<T> *b = &unique[i];
-            double v = b->get();
+            T v = b->get();
 
             if (v > GCA_PRECISION || v < (-GCA_PRECISION)) {
                unique_nonzero.push_back(*b);
@@ -367,7 +382,7 @@ namespace gca {
 
          _blades.clear();
          if (unique_nonzero.empty()) {
-            _blades.push_back(Blade<T>(0));
+            _blades.push_back(Blade<T>(0.0));
          } else {
             _blades.insert(_blades.end(), unique_nonzero.begin(), unique_nonzero.end());
          }

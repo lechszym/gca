@@ -4,8 +4,10 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <math.h>
+#include <cmath>
 #include <iostream>
+
+#include "Sym.h"
 
 namespace gca {
 
@@ -16,7 +18,7 @@ namespace gca {
    public:
 
       Blade() : _e() {
-         _v = 0;
+         _v = T(0.0);
       }
 
       Blade(T v) {

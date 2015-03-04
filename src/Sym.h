@@ -25,6 +25,11 @@ namespace gca {
          _sym = std::string(s);
          _inv = false;
       }
+
+      Sym(const double v) {
+          _v = v;
+          _inv = false;
+      }
       
       Sym(const Sym& orig) {
          _v = orig._v;
@@ -77,6 +82,28 @@ namespace gca {
          return a;
       }
  
+      Sym operator-(const Sym& m) const {
+         Sym a = Sym(*this);
+         Sym b = Sym(m);
+         
+         b._v *= -1;
+         
+         a._sum.push_back(b);
+         return a;
+      }
+
+      bool operator>=(double v) const {
+         return _v >= v;
+      }
+
+      bool operator<(double v) const {
+         return _v < v;
+      }
+      
+      bool operator>(double v) const {
+         return _v > v;
+      }      
+      
       std::string toString() const {
         std::stringstream ss;
 
