@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
    cout << "t = " << t << endl;
    cout << "I = " << I << endl;
 
-   MvecS  z = x*t;
+   MvecS  z = (x^t)*I;
    cout << "xt = " << z << endl;
 //   cout << "b1+b2=" << z << endl;
    

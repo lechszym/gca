@@ -78,17 +78,20 @@ namespace gca {
       
       Sym operator+(const Sym& m) const {
          Sym a = Sym(*this);
-         a._sum.push_back(m);
+         if(m._v != 0.0) {
+             a._sum.push_back(m);
+         }
          return a;
       }
  
       Sym operator-(const Sym& m) const {
          Sym a = Sym(*this);
          Sym b = Sym(m);
-         
-         b._v *= -1;
-         
-         a._sum.push_back(b);
+
+         if(b._v != 0.0) {
+             b._v *= -1;
+             a._sum.push_back(b);
+         }
          return a;
       }
 
