@@ -28,6 +28,10 @@ int main(int argc, char **argv) {
        }
    }
    
+   Sym x2 = Sym("x")+Sym("x");
+   cout << "x+x=" << (Sym("x")+Sym("x")) << endl;
+   cout << "2x-x=" << (x2-Sym("x")) << endl;
+   cout << "x-2x=" << (Sym("x")-x2) << endl;
     
    MvecS  x(bx);
    MvecS  t(bt);

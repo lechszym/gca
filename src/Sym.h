@@ -17,24 +17,25 @@ namespace gca {
 
       Sym() {
          _v = 0.0;
-         _inv = false;
-      }
-
-      Sym(const char s[]) {
-         _v = 1.0;
-         _sym = std::string(s);
-         _inv = false;
+         _pow = 1;
       }
 
       Sym(const double v) {
           _v = v;
-          _inv = false;
+          _pow = 1;
+      }
+      
+      Sym(const char s[]) : Sym(1.0)  {
+         Sym a;
+         a._v = 1.0;
+         a._sym = std::string(s);
+         _mult.push_back(a);
       }
       
       Sym(const Sym& orig) {
          _v = orig._v;
          _sym = orig._sym;
-         _inv = orig._inv;
+         _pow = orig._pow;
          _mult = orig._mult;
          _sum = orig._sum;
       }
@@ -53,11 +54,11 @@ namespace gca {
       
       Sym operator*(const Sym& m) const {
        
-         if(m._sym.empty()) {
+         if(m._mult.empty()) {
              return (*this) * m._v;
          } 
           
-         if(_sym.empty()) {
+         if(m._mult.empty()) {
              return m * _v;
          }
          
@@ -87,22 +88,50 @@ namespace gca {
       }
       
       Sym operator+(const Sym& m) const {
-         Sym a = Sym(*this);
-         if(m._v != 0.0) {
-             a._sum.push_back(m);
-         }
-         return a;
+         Sym a;
+         
+         if(_v == 0.0) {
+            return m;
+         } else if(m._v == 0.0) {
+            return *this;
+         } else {
+            if(equal(_mult,m._mult)) {
+               if(_sum.empty()) {
+                  if(m._sum.empty()) {
+                     a = Sym(*this);
+                     a._v += m._v;
+                     return a;
+                  } else {
+                     a = Sym(m);
+                     a._sum.push_back(Sym(_v));
+                     return a;
+                  }
+               } else if(m._sum.empty()) {
+                  a = Sym(*this);
+                  a._sum.push_back(Sym(m._v));
+                  return a;
+               } else {
+                  a = Sym(*this);
+                  a._sum.insert(a._sum.end(), m._sum.begin(), m._sum.end());
+                  return a;
+               }
+            } else {
+               a = Sym(*this);
+               a._sum.push_back(m);
+               return a;
+            }
+         } 
       }
  
       Sym operator-(const Sym& m) const {
-         Sym a = Sym(*this);
          Sym b = Sym(m);
 
          if(b._v != 0.0) {
-             b._v *= -1;
-             a._sum.push_back(b);
+            b._v *= -1;
+            return (*this+b);            
+         } else {
+            return *this;
          }
-         return a;
       }
 
       bool operator>=(double v) const {
@@ -120,7 +149,7 @@ namespace gca {
       std::string toString() const {
         std::stringstream ss;
 
-        if(_inv) {
+        if(_pow == -1) {
            ss << "/";
         }
         
@@ -132,7 +161,7 @@ namespace gca {
            ss << "(";
         }
 
-        if( (std::abs(_v) != 1.0) || _sym.empty()) {
+        if( (std::abs(_v) != 1.0) || (_mult.empty() && _sym.empty())) {
            ss << std::abs(_v);
         }
         
@@ -161,11 +190,31 @@ namespace gca {
          out << s.toString();
          return out;      
       }
-   
+      
+       //bool operator==(const Blade& b) const {
+      
    private:
+      
+      bool equal(const std::vector<Sym>& a, const std::vector<Sym>& b) const {
+         
+         if(a.size() != b.size()) {
+            return false;
+         }
+         
+         for(std::size_t i=0;i<a.size();i++) {
+            if( (a[i]._sym != b[i]._sym) ||
+                (a[i]._pow != b[i]._pow)) {
+               return false;
+            }
+         }
+         
+         
+         return true;
+      }
+      
       std::string _sym;
       double      _v;
-      bool        _inv;
+      int         _pow;
       std::vector<Sym> _mult;
       std::vector<Sym> _sum;
    };
