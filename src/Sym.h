@@ -52,6 +52,16 @@ namespace gca {
       }*/
       
       Sym operator*(const Sym& m) const {
+       
+         if(m._sym.empty()) {
+             return (*this) * m._v;
+         } 
+          
+         if(_sym.empty()) {
+             return m * _v;
+         }
+         
+         
          Sym a(*this);
          Sym b(m);
 
@@ -122,7 +132,7 @@ namespace gca {
            ss << "(";
         }
 
-        if(std::abs(_v) != 1.0) {
+        if( (std::abs(_v) != 1.0) || _sym.empty()) {
            ss << std::abs(_v);
         }
         
