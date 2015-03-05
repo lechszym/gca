@@ -9,20 +9,21 @@ int main(int argc, char **argv) {
    vector<BladeS> bx;
    vector<BladeS> bt;
    vector<BladeS> br;
+   char syms[] = {'1','2','3'};
    char buff[32];
    
-   br.push_back(BladeS(Sym("r0")));
+   br.push_back(BladeS(Sym("r_0")));
    
    for(unsigned int i=0;i<3;i++) {
-       sprintf(buff,"x%d", i+1);
+       sprintf(buff,"x_%c", syms[i]);
        bx.push_back(BladeS(Sym(buff),i+1));       
-       sprintf(buff,"t%d", i+1);
+       sprintf(buff,"t_%c", syms[i]);
        bt.push_back(BladeS(Sym(buff),i+1));       
        for(unsigned int j=i+1;j<3;j++) {
            vector<unsigned long> e;
            e.push_back(i+1);
            e.push_back(j+1);
-           sprintf(buff,"r%d%d", i+1, j+1);
+           sprintf(buff,"r_%c%c", syms[i], syms[j]);
            br.push_back(BladeS(Sym(buff),e));
        }
    }
