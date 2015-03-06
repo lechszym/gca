@@ -17,5 +17,5 @@ namespace gca {
     
     typedef Blade<Sym> BladeS;
     typedef Mvec<Sym> MvecS;
-        
+    
 }

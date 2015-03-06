@@ -68,19 +68,41 @@ namespace gca {
 
          a._v *= b._v;
          b._v = 1.0;
-         a._mult.push_back(b);
+
+         a._mult.insert(a._mult.end(), b._mult.begin(), b._mult.end());
+
+         std::sort(a._mult.begin(), a._mult.end(), Sym::compByString);         
          
          for(std::size_t i=0;i<a._sum.size();i++) {
             a._sum[i] = a._sum[i]*m;
          }
 
          for(std::size_t i=0;i<b._sum.size();i++) {
-            a._sum.push_back(b._sum[i]*(*this));
+            Sym c = b._sum[i]*(*this);
+            a = a+c;
          }
-         
+            
          return a;
       }
 
+      /*bool operator==(const Sym& m) const {
+         if(_mult.size() != m._mult.size()) {
+            return false;
+         }
+         
+         for(std::size_t i=0;i<_mult.size();i++) {
+            if( (_mult[i]._sym != b[i]._sym) ||
+                (a[i]._pow != b[i]._pow)) {
+               return false;
+            }
+         }
+         
+         
+         return true;
+
+         return false;
+      }*/
+      
       Sym operator*(const double x) const {
          Sym a = Sym(*this);
          a._v *= x;
@@ -122,7 +144,7 @@ namespace gca {
             }
          } 
       }
- 
+
       Sym operator-(const Sym& m) const {
          Sym b = Sym(m);
 
@@ -145,10 +167,15 @@ namespace gca {
       bool operator>(double v) const {
          return _v > v;
       }      
-      
+            
       std::string toString() const {
         std::stringstream ss;
 
+        if(_v == 0.0) {
+           ss << "0";
+           return ss.str();
+        }
+        
         if(_pow == -1) {
            ss << "/";
         }
@@ -212,6 +239,10 @@ namespace gca {
          return true;
       }
       
+      static bool compByString(const Sym &a, const Sym &b) {
+         return (a._sym<b._sym); 
+      }
+      
       std::string _sym;
       double      _v;
       int         _pow;
@@ -219,8 +250,16 @@ namespace gca {
       std::vector<Sym> _sum;
    };
    
-}
+   inline Sym operator*(double v, const Sym& m) {
+      return m*Sym(v);
+   }    
 
+   inline Sym operator+(double v, const Sym& m) {
+      return m+Sym(v);
+   }       
+}
+   
+      
 
 #endif	/* SYM_H */
 
