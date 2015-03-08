@@ -9,6 +9,7 @@
 #define	SYM_H
 
 #include <string>
+#include <algorithm>
 
 namespace gca {
   
@@ -94,7 +95,13 @@ namespace gca {
          return result;
       }
       
+      Mult operator*=(const double x) const {
+         Mult result = Mult(*this);
+         result._v *= x;
+         return result;
+      }
 
+      
       bool operator>=(double v) const {
          return _v >= v;
       }
@@ -147,6 +154,13 @@ namespace gca {
          return out;      
       }
       
+      static bool compBySym(const sym_t &a, const sym_t &b) {
+         if(a.pow == b.pow) {
+            return a.s < b.s;
+         } else {
+            return a.pow > b.pow;
+         }
+      }
       
    private:
       
@@ -167,13 +181,6 @@ namespace gca {
          return true;
       }
       
-      static bool compBySym(const sym_t &a, const sym_t &b) {
-         if(a.pow == b.pow) {
-            return a.s < b.s;
-         } else {
-            return a.pow > b.pow;
-         }
-      }
       
       //std::string _sym;
       double      _v;
@@ -224,6 +231,8 @@ namespace gca {
                }
             }
          }
+         std::sort(result._sum.begin(), result._sum.end(), Sym::compByMult);         
+        
          
          return result;
       }
@@ -240,6 +249,7 @@ namespace gca {
          } else {
             Sym result(*this);
             result._sum.insert(result._sum.end(),m._sum.begin(),m._sum.end());
+            std::sort(result._sum.begin(), result._sum.end(), Sym::compByMult);         
             return result;
          }
          
@@ -280,7 +290,7 @@ namespace gca {
 
       }
       
-      Sym operator==(double x) const {
+      bool operator==(double x) const {
          if(_sum.empty()) {
             return true;
          } else {
@@ -293,25 +303,64 @@ namespace gca {
          return true;
       }
 
+      Sym operator-()  {
+          Sym result(*this);
+          
+          for(std::size_t i=0;i<_sum.size();i++) {
+              _sum[i] *= -1.0;
+          }
+          std::sort(result._sum.begin(), result._sum.end(), Sym::compByMult);         
+          return result;
+      }
+      
       Sym operator-(const Sym& m) const {
-         Sym b = Sym(m);
-         for(std::size_t i=0;i<b._sum.size();i++) {
-            b._sum[i] *= -1.0;
-         }
-         return (*this)+b;
+         return (*this)+(-Sym(m));
       }
 
-      /*bool operator>=(double v) const {
-         return _v >= v;
+      bool operator>=(double v) const {
+          if(_sum.empty()) {
+              return 0>=v;
+          }
+          
+          /*for(std::size_t i=0;i<_sum.size();i++) {
+              if(_sum[i] >= v) {
+                  return true;
+              }
+          }*/
+          
+         return _sum[0] >= v;
       }
 
       bool operator<(double v) const {
-         return _v < v;
+          if(_sum.empty()) {
+              return 0.0<v;
+          }
+          
+          return _sum[0] < v;
+          /*for(std::size_t i=0;i<_sum.size();i++) {
+              if(_sum[i] > v) {
+                  return false;
+              }
+          }
+          
+         return true;*/
       }
       
       bool operator>(double v) const {
-         return _v > v;
-      } */     
+          if(_sum.empty()) {
+              return 0.0>v;
+          }
+          
+          return _sum[0]> v;
+          
+          /*for(std::size_t i=0;i<_sum.size();i++) {
+              if(_sum[i] > v) {
+                  return true;
+              }
+          }*/
+          
+         return false;
+      }     
             
       /*std::string show(int spaces=1) const {
          std::stringstream ss;
@@ -375,10 +424,16 @@ namespace gca {
         //   ss << "-";
         //}
 
+        int flip = 1;
         if(_sum.size() > 1) {
+           if(_sum[0] < 0.0) {
+               flip = -1;
+               ss << "-";
+           }
            ss << "(";
         }
 
+        
         //if( _v == -1.0) {
         //   ss << "-";
         //}
@@ -387,10 +442,11 @@ namespace gca {
         //   ss << std::abs(_v);
         //}
         for(std::size_t i=0;i<_sum.size();i++) {
-           if(_sum[i] > 0.0) {
+            Mult m = _sum[i] * flip;
+           if(i > 0 && m > 0.0) {
               ss << "+";
            }
-           ss << _sum[i];
+           ss << m;
         }
         
         if(_sum.size() > 1) {
@@ -410,7 +466,19 @@ namespace gca {
        //bool operator==(const Blade& b) const {
       
    private:
-      
+ 
+      static bool compByMult(const Mult &a, const Mult &b) {
+          if(a < 0) {
+              if(b > 0) {
+                  return false;
+              }
+          } else if(b < 0) {
+              return true;
+          }
+          
+          return true;
+      }       
+       
       /*bool equal(const std::vector<syms_t>& a, const std::vector<syms_t>& b) const {
          
          if(a.size() != b.size()) {
