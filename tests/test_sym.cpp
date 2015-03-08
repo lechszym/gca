@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
    
    br.push_back(BladeS(Sym("r_0")));
    
+   int k=0;
    for(unsigned int i=0;i<3;i++) {
        sprintf(buff,"x_%c", syms[i]);
        bx.push_back(BladeS(Sym(buff),i+1));       
@@ -23,14 +24,14 @@ int main(int argc, char **argv) {
            vector<unsigned long> e;
            e.push_back(i+1);
            e.push_back(j+1);
-           sprintf(buff,"r_%c%c", syms[i], syms[j]);
+           sprintf(buff,"r_%c", syms[k++]);
            br.push_back(BladeS(Sym(buff),e));
        }
    }
    
    //Sym x2 = Sym("x")+Sym("x");
-   cout << "x-x=" << (Sym("x")-Sym("x")) << endl;
-   cout << "2x-x=" << (2*Sym("x")-Sym("x")) << endl;
+   //cout << "x-x=" << (Sym("x")-Sym("x")) << endl;
+   //cout << "2x-x=" << (2*Sym("x")-Sym("x")) << endl;
    //cout << "x-2x=" << (Sym("x")-x) << endl;
     
    MvecS  x(bx);
@@ -43,17 +44,30 @@ int main(int argc, char **argv) {
    cout << "I = " << I << endl;
    cout << "R = " << R << endl;
 
+   
+   //cout << "R:\n";
+   //R.show();
+
+   //cout << "R:\n";
+   //x.show();
+
+   
+   MvecS Rdx = R&x;
+   MvecS Rwx = R^x;
+   cout << "\nR&x= " << Rdx << endl;
+   cout << "\nR^x=" << Rwx << endl;
+   
    MvecS za = R*x;
    MvecS zza = za&~R;
    MvecS zzb = za^~R;
    MvecS zb = za*~R;
-   cout << "Rx= " << za << endl;
-   cout << "~R=" << ~R << endl;
-   cout << "Rx&~R= " << zza << endl;
-   cout << "Rx^~R= " << zzb << endl;
-   cout << "Rx~R= " << zb << endl;
+   cout << "\nRx= " << za << endl;
+   cout << "\n~R=" << ~R << endl;
+   cout << "\nRx&~R= " << zza << endl;
+   cout << "\nRx^~R= " << zzb << endl;
+   cout << "\nRx~R= " << zb << endl;
    
-   MvecS  z = (x^t);
+   /*MvecS  z = (x^t);
    cout << "x^t = " << z << endl;
    
    MvecS w = z*(-I);
@@ -62,7 +76,7 @@ int main(int argc, char **argv) {
    MvecS g1 = R*w;
    MvecS g2 = g1*(~R);
    
-   cout << "R(x^t)I~R=" << g2 << endl;
+   cout << "R(x^t)I~R=" << g2 << endl;*/
    
    return 0;
 }
