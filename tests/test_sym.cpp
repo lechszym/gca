@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
    vector<BladeS> bx;
    vector<BladeS> bt;
    vector<BladeS> br;
+   vector<BladeS> bw;
    char syms[] = {'1','2','3'};
    char buff[32];
    
@@ -18,6 +19,8 @@ int main(int argc, char **argv) {
    for(unsigned int i=0;i<3;i++) {
        sprintf(buff,"x_%c", syms[i]);
        bx.push_back(BladeS(Sym(buff),i+1));       
+       sprintf(buff,"w_%c", syms[i]);
+       bw.push_back(BladeS(Sym(buff),i+1));       
        sprintf(buff,"t_%c", syms[i]);
        bt.push_back(BladeS(Sym(buff),i+1));       
        for(unsigned int j=i+1;j<3;j++) {
@@ -36,6 +39,7 @@ int main(int argc, char **argv) {
     
    MvecS  x(bx);
    MvecS  t(bt);
+   MvecS  w(bw);
    MvecS  I=MvecS::I(3);
    MvecS  R(br);
    
@@ -67,16 +71,20 @@ int main(int argc, char **argv) {
    cout << "\nRx^~R= " << zzb << endl;
    cout << "\nRx~R= " << zb << endl;
    
-   /*MvecS  z = (x^t);
+   MvecS  z = (x^t);
    cout << "x^t = " << z << endl;
    
-   MvecS w = z*(-I);
-   cout << "(x^t)I=" << w << endl;
+   MvecS wz = z*(-I);
+   cout << "(x^t)I=" << wz << endl;
    
-   MvecS g1 = R*w;
+   MvecS g1 = R*wz;
    MvecS g2 = g1*(~R);
    
-   cout << "R(x^t)I~R=" << g2 << endl;*/
+   cout << "R(x^t)I~R=" << g2 << endl;
+
+   MvecS g3 = g2&w;
+   
+   cout << "Total: " << g3 << endl;
    
    return 0;
 }

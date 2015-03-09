@@ -63,8 +63,29 @@ namespace gca {
          
          result._v *= m._v;
 
-         result._mult.insert(result._mult.end(), m._mult.begin(), m._mult.end());
+         for(std::size_t i=0;i<m._mult.size();i++) {
+             std::vector<sym_t>::iterator si = result._mult.begin();
+    
+             bool multiplied = false;
+             while(si != result._mult.end()) {
+                if(si->s == m._mult[i].s) {
+                    si->pow += m._mult[i].pow;
 
+                    if(si->pow == 0) {
+                        si = result._mult.erase(si);
+                    }
+                    multiplied = true;
+                    break;
+                 }
+                 si++;
+             }         
+             if(multiplied) {
+                 continue;
+             }
+
+             result._mult.push_back(m._mult[i]);
+         }
+         
          std::sort(result._mult.begin(), result._mult.end(), Mult::compBySym);         
          
          
@@ -122,6 +143,10 @@ namespace gca {
          }
       }
       
+      bool operator==(const Mult &m) const {
+          return equal(_mult,m._mult);
+      }
+      
       std::string toString() const {
         std::stringstream ss;
 
@@ -161,8 +186,6 @@ namespace gca {
             return a.pow > b.pow;
          }
       }
-      
-   private:
       
       bool equal(const std::vector<sym_t>& a, const std::vector<sym_t>& b) const {
          
@@ -227,16 +250,40 @@ namespace gca {
             for(std::size_t j=0;j<b._sum.size();j++) {
                Mult m = _sum[i]*b._sum[j];
                if( !(m == 0.0) ) {
-                  result._sum.push_back(m);
+                  result += m;
                }
             }
          }
          std::sort(result._sum.begin(), result._sum.end(), Sym::compByMult);         
-        
-         
          return result;
       }
 
+      Sym& operator+=(const Mult& m) {
+         if(m == 0.0) {
+            return *this;
+         } else {
+             std::vector<Mult>::iterator si = _sum.begin();
+             bool added = false;
+             
+             while(si != _sum.end()) {
+                 if(*si == m) {
+                    si->_v += m._v;
+                    if(*si == 0.0) {
+                        _sum.erase(si);
+                    }
+                    added = true;
+                    break;
+                 }
+                 si++;
+             }
+
+             if(!added) {
+                 _sum.push_back(m);
+             }
+        }
+        return *this;
+      }
+      
       Sym operator*(const double x) const {
          return (*this)*Sym(x);
       }
@@ -248,7 +295,9 @@ namespace gca {
             return *this;
          } else {
             Sym result(*this);
-            result._sum.insert(result._sum.end(),m._sum.begin(),m._sum.end());
+            for(std::size_t i=0;i<m._sum.size();i++) {
+                result += m._sum[i];
+            }
             std::sort(result._sum.begin(), result._sum.end(), Sym::compByMult);         
             return result;
          }
@@ -303,14 +352,12 @@ namespace gca {
          return true;
       }
 
-      Sym operator-()  {
-          Sym result(*this);
-          
+      Sym& operator-()  {
           for(std::size_t i=0;i<_sum.size();i++) {
               _sum[i] *= -1.0;
           }
-          std::sort(result._sum.begin(), result._sum.end(), Sym::compByMult);         
-          return result;
+          std::sort(_sum.begin(), _sum.end(), Sym::compByMult);         
+          return (*this);
       }
       
       Sym operator-(const Sym& m) const {
