@@ -10,6 +10,7 @@
 
 #include <string>
 #include <algorithm>
+#include <iostream>
 
 namespace gca {
   
@@ -296,9 +297,13 @@ namespace gca {
          } else {
             Sym result(*this);
             for(std::size_t i=0;i<m._sum.size();i++) {
+               //std::cout << "\n      adding: " << m._sum[i] << "\n";
                 result += m._sum[i];
+                //std::cout << "      adding done\n";
             }
+            //std:: cout << "      || " << result << "\n";
             std::sort(result._sum.begin(), result._sum.end(), Sym::compByMult);         
+            //std:: cout << "      sorted " << "\n";
             return result;
          }
          
@@ -409,51 +414,22 @@ namespace gca {
          return false;
       }     
             
-      /*std::string show(int spaces=1) const {
+      std::string show() const {
          std::stringstream ss;
          
-         if(spaces == 1) {
-            ss << "\n";
-         }
-         
-         for(int i=0;i<spaces;i++) {
-            ss << ".";
-         }
-         
-         ss << "_v:" << _v << std::endl;
-         
-         for(int i=0;i<spaces;i++) {
-            ss << ".";
-         }
-
-         if(!_mult.empty()) {
-            ss << "_mult: ";
-            for(std::size_t i=0;i<_mult.size();i++) {
-               ss << _mult[i].s;
-            }
-            ss << std::endl;
-         }
-         
-         //for(std::size_t i=0;i<_mult.size();i++) {
-         //   ss << _mult[i].show(spaces+1);
-         }//
-
-         if(!_sum.empty()) {
-            
-            for(int i=0;i<spaces;i++) {
-               ss << ".";
-            }
-
-            ss << "_sum:" << std::endl;
-         }
+         ss << "\nsum:\n";
          
          for(std::size_t i=0;i<_sum.size();i++) {
-            ss << _sum[i].show(spaces+1);
+            ss << " " << i << ": " << _sum[i]._v << " * ";
+            
+            for(std::size_t j=0;j<_sum[i]._mult.size();j++) {
+               ss << " (" << _sum[i]._mult[j].s << "," << _sum[i]._mult[j].pow << ")";
+            }
          }
          
          return ss.str();
          
-      }*/
+      }
       
       std::string toString() const {
         std::stringstream ss;
@@ -515,15 +491,20 @@ namespace gca {
    private:
  
       static bool compByMult(const Mult &a, const Mult &b) {
-          if(a < 0) {
-              if(b > 0) {
+         //std::cout << "        comparing: [" << a << "] with [" << b << "]\n"; 
+          if(a < 0.0) {
+              if(b > 0.0) {
+                 //std::cout << "        b is larger\n";
                   return false;
               }
-          } else if(b < 0) {
+          } else if(b < 0.0) {
+              //std::cout << "        a is larger\n";
               return true;
           }
-          
-          return true;
+          //std::cout << "        larger but why\n";
+          //if(a._v > b._v)
+         
+          return a._v < b._v;
       }       
        
       /*bool equal(const std::vector<syms_t>& a, const std::vector<syms_t>& b) const {

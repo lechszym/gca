@@ -354,19 +354,31 @@ namespace gca {
             return;
          }
 
+         //std::cout << "\n-- pruning phase 1--\n";
          std::vector<Blade<T> > unique;
 
          unique.push_back(_blades[0]);
 
          for (std::size_t i = 1; i < _blades.size(); i++) {
+            //std:: cout << "  blade " << i << "/" << _blades.size();
             Blade<T> *b = &_blades[i];
             typename std::vector<Blade<T> >::iterator bi = std::find(unique.begin(), unique.end(), *b);
             if (bi != unique.end()) {
+               //std::cout << "\n bi:" << *bi << "\n"; 
+               //std::cout << " b:" << *b << "\n"; 
+               //std::cout << " bi->get():" << bi->get() << "\n"; 
+               //std::cout << " b->get():" << b->get() << "\n"; 
+               //std::cout << " --reducing\n";
                bi->set(bi->get() + b->get());
+               //std::cout << " done reducing--\n";
             } else {
+               //std::cout << " --unique\n";
                unique.push_back(*b);
+               //std::cout << " done unique--\n";
             }
          }
+         
+         //std::cout << "\n-- pruning phase 2--\n";
 
          std::vector<Blade<T> > unique_nonzero;
 
@@ -386,9 +398,11 @@ namespace gca {
          } else {
             _blades.insert(_blades.end(), unique_nonzero.begin(), unique_nonzero.end());
          }
+         //std::cout << "\n-- pruning done--\n";
       }
 
       std::vector<Blade<T> > _blades;
+
 
    };
 
