@@ -18,7 +18,6 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
    
    char *cmd = (char *) mxGetPr(prhs[0]);
    
-
    switch(*cmd) {
 
        case 'n': {
@@ -54,6 +53,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
        case '*':
        case '+':
        case '-':
+       case '/':
        {
            if(nrhs < 3) {
                help();
@@ -75,6 +75,10 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
             case '*':
                 c = a*b;
                 break;
+                
+            case '/': 
+                c = a/b;
+                break;                
                 
             case '+':
                 c = a+b;
@@ -136,7 +140,7 @@ void mexFunction(int nlhs, mxArray *plhs[ ], int nrhs, const mxArray *prhs[]) {
            }
            
            mxMvec<double> m(prhs[1]);
-           cout << m << endl;
+           printf("%s\n", m.toString().c_str());
            break;
        }        
        default:

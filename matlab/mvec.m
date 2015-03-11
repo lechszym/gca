@@ -70,6 +70,10 @@ classdef mvec < handle
         %end
       end
       
+      function c = mrdivide(a,b)
+        c = mvec(gcamvec('/',a,b));
+      end
+      
       function c = not(m)
          c = mvec(gcamvec('~',m));          
       end
