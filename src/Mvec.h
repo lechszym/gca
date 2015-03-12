@@ -384,7 +384,7 @@ namespace gca {
          for (std::size_t i = 0; i < _blades.size(); i++) {
             if(unique[i]) {
                T v = _blades[i].get();
-               if (v > GCA_PRECISION || v < (-GCA_PRECISION)) {
+               if (v < GCA_PRECISION && v > (-GCA_PRECISION)) {
                   unique[i] = false;
                } else {
                   iszero = false;
