@@ -129,6 +129,7 @@ namespace gca {
             result->_blades[n * 2] = a->at(ia) & b->at(ib);
             result->_blades[n * 2 + 1] = a->at(ia) ^ b->at(ib);
          }
+         result->prune();
          return *result;
       }
 
@@ -354,21 +355,84 @@ namespace gca {
             return;
          }
 
-         std::vector<Blade<T> > unique;
+         //std::vector<Blade<T> > unique;
+         bool unique[_blades.size()];
 
-         unique.push_back(_blades[0]);
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            unique[i] = true;
+         }      
+         //unique.push_back(_blades[0]);
 
-         for (std::size_t i = 1; i < _blades.size(); i++) {
-            Blade<T> *b = &_blades[i];
-            typename std::vector<Blade<T> >::iterator bi = std::find(unique.begin(), unique.end(), *b);
-            if (bi != unique.end()) {
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            if(!unique[i]) {
+               continue;
+            }
+            
+            for(std::size_t j=i+1; j < _blades.size(); j++) {
+               if(!unique[j]) {
+                  continue;
+               }
+
+               if(_blades[i] == _blades[j]) {
+                  _blades[i].set(_blades[i].get()+_blades[j].get());
+                  unique[j] = false;
+               }
+            }
+         }
+
+         bool iszero = true;
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            if(unique[i]) {
+               T v = _blades[i].get();
+               if (v > GCA_PRECISION || v < (-GCA_PRECISION)) {
+                  unique[i] = false;
+               } else {
+                  iszero = false;
+               }
+            }
+         }      
+
+         if(iszero) {
+            _blades.clear();
+            _blades.push_back(Blade<T>(0.0));
+         } else {
+             std::size_t removed = 0;
+             std::size_t last = _blades.size();
+             for (std::size_t i = 0; i < _blades.size(); i++) {
+                if(!unique[i]) {
+                   std::size_t lastToKeep = last;
+                   for (std::size_t j=last-1; j>i; j--) {
+                      if(unique[j]) {
+                         lastToKeep = j;
+                         break;
+                      } else {
+                         last--;
+                         removed++;
+                      }
+                   }
+                   if(lastToKeep < last) {
+                      _blades[i] = _blades[lastToKeep];
+                      last = lastToKeep;
+                      removed++;
+                   } else {
+                      break;
+                   }
+                }
+             }
+             if(removed) {
+                _blades.resize(_blades.size()-removed);
+             }
+         }
+            //Blade<T> *b = &_blades[i];
+            //typename std::vector<Blade<T> >::iterator bi = std::find(unique.begin(), unique.end(), *b);
+         /*   if (bi != unique.end()) {
                bi->set(bi->get() + b->get());
             } else {
                unique.push_back(*b);
             }
-         }
+         }*/
          
-         std::vector<Blade<T> > unique_nonzero;
+         /*std::vector<Blade<T> > unique_nonzero;
 
          for (std::size_t i = 0; i < unique.size(); i++) {
             Blade<T> *b = &unique[i];
@@ -385,7 +449,7 @@ namespace gca {
             _blades.push_back(Blade<T>(0.0));
          } else {
             _blades.insert(_blades.end(), unique_nonzero.begin(), unique_nonzero.end());
-         }
+         }*/
       }
 
       std::vector<Blade<T> > _blades;

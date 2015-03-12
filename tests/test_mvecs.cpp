@@ -11,7 +11,7 @@
 using namespace std;
 using namespace gca;
 
-const unsigned int numTests = 5;
+const unsigned int numTests = 25;
 
 double timediff(struct timeval &start, struct timeval &end) {
    return ((end.tv_sec - start.tv_sec) * 1000000u +
