@@ -462,7 +462,7 @@ namespace gca {
    template<> inline
    Mvec<double>::Mvec(Eigen::Matrix<double, Eigen::Dynamic, 1> &v) {
       _blades = std::vector<Blade<double> >(v.size());
-      for (unsigned int i = 0; i < v.size(); i++) {
+      for(int i = 0; i < v.size(); i++) {
          _blades[i] = Blade<double>(v(i, 0), i + 1);
       }
       this->prune();
@@ -471,7 +471,7 @@ namespace gca {
    template<> inline
    Mvec<double>::Mvec(Eigen::Matrix<double, 1, Eigen::Dynamic> &v) {
       _blades = std::vector<Blade<double> >(v.size());
-      for (unsigned int i = 0; i < v.size(); i++) {
+      for (int i = 0; i < v.size(); i++) {
          _blades[i] = Blade<double>(v(0, i), i + 1);
       }
       this->prune();
