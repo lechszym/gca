@@ -74,6 +74,28 @@ namespace gca {
 
       }
 
+      Mvec& operator+=(const Blade<T>& b) {
+         T v = b.get();
+         if ( (v < GCA_PRECISION) && (v > (-GCA_PRECISION))) {
+            return *this;
+         }
+
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            if(_blades[i] == b) {
+               v = _blades[i].get() + b.get();
+               if ( (v > GCA_PRECISION) || (v < (-GCA_PRECISION))) {
+                  _blades[i].set(v);
+               } else {
+                  _blades.erase(_blades.begin() + i);
+               }
+               return *this;
+            }
+         }      
+         _blades.push_back(b);
+         
+         return *this;
+      }
+      
       Mvec& inner(const Mvec &m) const {
          const std::vector<Blade<T> > *a = &_blades;
          const std::vector<Blade<T> > *b = &m._blades;
@@ -83,12 +105,13 @@ namespace gca {
          Mvec *result = new Mvec(N);
 
 #ifdef OMP_ENABLED         
-#pragma omp parallel for
+#pragma omp parallel for reduction (+: result)
 #endif
          for (std::size_t n = 0; n < N; n++) {
             std::size_t ia = n / Nb;
             std::size_t ib = n % Nb;
             result->_blades[n] = a->at(ia) & b->at(ib);
+            //*result += (a->at(ia) & b->at(ib));
          }
          return *result;
       }
@@ -102,12 +125,13 @@ namespace gca {
          Mvec *result = new Mvec(N);
 
 #ifdef OMP_ENABLED         
-#pragma omp parallel for
+#pragma omp parallel for reduction (+: result)
 #endif
          for (std::size_t n = 0; n < N; n++) {
             std::size_t ia = n / Nb;
             std::size_t ib = n % Nb;
             result->_blades[n] = a->at(ia) ^ b->at(ib);
+            //*result += (a->at(ia) ^ b->at(ib));
          }
          return *result;
       }
@@ -121,15 +145,17 @@ namespace gca {
          Mvec *result = new Mvec(2 * N);
 
 #ifdef OMP_ENABLED         
-#pragma omp parallel for
+#pragma omp parallel for reduction (+: result)
 #endif
          for (std::size_t n = 0; n < N; n++) {
             std::size_t ia = n / Nb;
             std::size_t ib = n % Nb;
             result->_blades[n * 2] = a->at(ia) & b->at(ib);
             result->_blades[n * 2 + 1] = a->at(ia) ^ b->at(ib);
+            //*result += (a->at(ia) & b->at(ib));
+            //*result += (a->at(ia) ^ b->at(ib));         
          }
-         result->prune();
+         //result->prune();
          return *result;
       }
 
@@ -355,13 +381,11 @@ namespace gca {
             return;
          }
 
-         //std::vector<Blade<T> > unique;
-         bool unique[_blades.size()];
+         /*bool unique[_blades.size()];
 
          for (std::size_t i = 0; i < _blades.size(); i++) {
             unique[i] = true;
          }      
-         //unique.push_back(_blades[0]);
 
          for (std::size_t i = 0; i < _blades.size(); i++) {
             if(!unique[i]) {
@@ -422,25 +446,27 @@ namespace gca {
              if(removed) {
                 _blades.resize(_blades.size()-removed);
              }
-         }
-            //Blade<T> *b = &_blades[i];
-            //typename std::vector<Blade<T> >::iterator bi = std::find(unique.begin(), unique.end(), *b);
-         /*   if (bi != unique.end()) {
+         }*/
+         std::vector<Blade<T> > unique;
+         unique.push_back(_blades[0]);
+         for (std::size_t i = 0; i < _blades.size(); i++) {
+            Blade<T> *b = &_blades[i];
+            typename std::vector<Blade<T> >::iterator bi = std::find(unique.begin(), unique.end(), *b);
+            if (bi != unique.end()) {
                bi->set(bi->get() + b->get());
             } else {
                unique.push_back(*b);
             }
-         }*/
+         }
          
-         /*std::vector<Blade<T> > unique_nonzero;
+         std::vector<Blade<T> > unique_nonzero;
 
          for (std::size_t i = 0; i < unique.size(); i++) {
             Blade<T> *b = &unique[i];
             T v = b->get();
 
-            if (v > GCA_PRECISION || v < (-GCA_PRECISION)) {
+            if ( (v > GCA_PRECISION) || (v < (-GCA_PRECISION))) {
                unique_nonzero.push_back(*b);
-
             }
          }
 
@@ -449,7 +475,7 @@ namespace gca {
             _blades.push_back(Blade<T>(0.0));
          } else {
             _blades.insert(_blades.end(), unique_nonzero.begin(), unique_nonzero.end());
-         }*/
+         }
       }
 
       std::vector<Blade<T> > _blades;
