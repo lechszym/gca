@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
    result = R*x;
    cout << "R*x=" << result << endl;
 
-   result = R^x+R&x;
+   result = (R^x)+(R&x);
    cout << "R*x=" << result << endl;
 
    result = R*x*~R;

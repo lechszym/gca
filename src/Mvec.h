@@ -41,10 +41,6 @@ namespace gca {
          _blades.push_back(b);
       }
 
-      Mvec(std::size_t N) {
-         _blades = std::vector<Blade<T> >(N);
-      }
-
       Mvec(double v, unsigned long e) {
          _blades.push_back(Blade<T>(v, e));
       }
@@ -112,14 +108,13 @@ namespace gca {
          return result;
       }
 
-      
       Mvec inner(const Mvec &m) const {
          const std::vector<Blade<T> > *a = &_blades;
          const std::vector<Blade<T> > *b = &m._blades;
          std::size_t Na = a->size();
          std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
-         Mvec result(N);
+         Mvec result;
 
 #ifdef OMP_ENABLED         
 #pragma omp parallel for reduction (+: result)
@@ -138,7 +133,7 @@ namespace gca {
          std::size_t Na = a->size();
          std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
-         Mvec result(N);
+         Mvec result;
 
 #ifdef OMP_ENABLED         
 #pragma omp parallel for reduction (+: result)
@@ -157,7 +152,7 @@ namespace gca {
          std::size_t Na = a->size();
          std::size_t Nb = b->size();
          std::size_t N = Na*Nb;
-         Mvec result(2 * N);
+         Mvec result;
 
 #ifdef OMP_ENABLED         
 #pragma omp parallel for reduction (+: result)
@@ -172,20 +167,21 @@ namespace gca {
       }
 
       Mvec operator*(const T v) const {
+         Mvec result;
          if (v < GCA_PRECISION && v > (-GCA_PRECISION)) {
-            return Mvec();
-         }
-         Mvec result = new Mvec(_blades);
-         for (std::size_t i = 0; i < result->_blades.size(); i++) {
-            result->_blades[i].set(result->_blades[i].get() * v);
+             for (std::size_t i = 0; i < _blades.size(); i++) {
+                Blade<T> b = _blades[i] * v;
+                T vtemp = b.get();
+                if( (vtemp > GCA_PRECISION) || (vtemp < (-GCA_PRECISION))) {
+                    result._blades.push_back(b);
+                }
+            }
          }
          return result;
       }
 
       Mvec operator/(const Mvec& m) const {
-         double mMag = m.mag();
-         Mvec mInv = m.conj();
-         mInv /= mMag;
+         Mvec mInv = m.conj() / m.mag();
          Mvec result = (*this) * mInv;
          return result;
       }
@@ -227,7 +223,7 @@ namespace gca {
       Mvec operator-(const Mvec& m) const {
          Mvec result(*this);
          for (std::size_t i = 0; i < m._blades.size(); i++) {
-            result += (-m._blades[i]);
+            result += (m._blades[i] * -1.0);
          }
          return result;
       }
@@ -250,9 +246,9 @@ namespace gca {
       }
 
       Mvec& conj() const {
-         Mvec *result = new Mvec(_blades.size());
+         Mvec *result = new Mvec();
          for (std::size_t i = 0; i < _blades.size(); i++) {
-            result->_blades[i] = _blades[i].conj();
+            result->_blades.push_back(_blades[i].conj());
          }
          return *result;
       }
