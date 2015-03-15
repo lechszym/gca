@@ -259,8 +259,6 @@ namespace gca {
          if (_blades.empty()) {
             ss << "0";
          } else {
-            //this->prune();
-            //std::vector<Blade<T> > blades = _blades;
             sort(_blades.begin(), _blades.end());
             for (std::size_t i = 0; i < _blades.size(); i++) {
                if (i) {
@@ -358,111 +356,6 @@ namespace gca {
       
    protected:
 
-#if 0      
-      void prune() {
-
-         if (_blades.size() < 2) {
-            return;
-         }
-
-         /*bool unique[_blades.size()];
-
-         for (std::size_t i = 0; i < _blades.size(); i++) {
-            unique[i] = true;
-         }      
-
-         for (std::size_t i = 0; i < _blades.size(); i++) {
-            if(!unique[i]) {
-               continue;
-            }
-            
-            for(std::size_t j=i+1; j < _blades.size(); j++) {
-               if(!unique[j]) {
-                  continue;
-               }
-
-               if(_blades[i] == _blades[j]) {
-                  _blades[i].set(_blades[i].get()+_blades[j].get());
-                  unique[j] = false;
-               }
-            }
-         }
-
-         bool iszero = true;
-         for (std::size_t i = 0; i < _blades.size(); i++) {
-            if(unique[i]) {
-               T v = _blades[i].get();
-               if (v < GCA_PRECISION && v > (-GCA_PRECISION)) {
-                  unique[i] = false;
-               } else {
-                  iszero = false;
-               }
-            }
-         }      
-
-         if(iszero) {
-            _blades.clear();
-            _blades.push_back(Blade<T>(0.0));
-         } else {
-             std::size_t removed = 0;
-             std::size_t last = _blades.size();
-             for (std::size_t i = 0; i < _blades.size(); i++) {
-                if(!unique[i]) {
-                   std::size_t lastToKeep = last;
-                   for (std::size_t j=last-1; j>i; j--) {
-                      if(unique[j]) {
-                         lastToKeep = j;
-                         break;
-                      } else {
-                         last--;
-                         removed++;
-                      }
-                   }
-                   if(lastToKeep < last) {
-                      _blades[i] = _blades[lastToKeep];
-                      last = lastToKeep;
-                      removed++;
-                   } else {
-                      break;
-                   }
-                }
-             }
-             if(removed) {
-                _blades.resize(_blades.size()-removed);
-             }
-         }*/
-         std::vector<Blade<T> > unique;
-         unique.push_back(_blades[0]);
-         for (std::size_t i = 0; i < _blades.size(); i++) {
-            Blade<T> *b = &_blades[i];
-            typename std::vector<Blade<T> >::iterator bi = std::find(unique.begin(), unique.end(), *b);
-            if (bi != unique.end()) {
-               bi->set(bi->get() + b->get());
-            } else {
-               unique.push_back(*b);
-            }
-         }
-         
-         std::vector<Blade<T> > unique_nonzero;
-
-         for (std::size_t i = 0; i < unique.size(); i++) {
-            Blade<T> *b = &unique[i];
-            T v = b->get();
-
-            if ( (v > GCA_PRECISION) || (v < (-GCA_PRECISION))) {
-               unique_nonzero.push_back(*b);
-            }
-         }
-
-         _blades.clear();
-         if (unique_nonzero.empty()) {
-            _blades.push_back(Blade<T>(0.0));
-         } else {
-            _blades.insert(_blades.end(), unique_nonzero.begin(), unique_nonzero.end());
-         }
-      }
-#endif
-      
       std::vector<Blade<T> > _blades;
 
 
@@ -476,7 +369,6 @@ namespace gca {
       for(int i = 0; i < v.size(); i++) {
          _blades[i] = Blade<double>(v(i, 0), i + 1);
       }
-      //this->prune();
    }
 
    template<> inline
@@ -485,7 +377,6 @@ namespace gca {
       for (int i = 0; i < v.size(); i++) {
          _blades[i] = Blade<double>(v(0, i), i + 1);
       }
-      //this->prune();
    }
 #endif
 
