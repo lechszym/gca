@@ -32,11 +32,6 @@ int main(int argc, char **argv) {
        }
    }
    
-   //Sym x2 = Sym("x")+Sym("x");
-   //cout << "x-x=" << (Sym("x")-Sym("x")) << endl;
-   //cout << "2x-x=" << (2*Sym("x")-Sym("x")) << endl;
-   //cout << "x-2x=" << (Sym("x")-x) << endl;
-    
    MvecS  x(bx);
    MvecS  t(bt);
    MvecS  w(bw);
@@ -44,47 +39,30 @@ int main(int argc, char **argv) {
    MvecS  R(br);
    
    cout << "x = " << x << endl;
+   cout << "w = " << w << endl;
    cout << "t = " << t << endl;
    cout << "I = " << I << endl;
-   cout << "R = " << R << endl;
+   cout << "R = " << R << endl << endl;
 
    
-   //cout << "R:\n";
-   //R.show();
+   MvecS result = R&x;
+   cout << "R&x= " << result << endl;
 
-   //cout << "R:\n";
-   //x.show();
+   result = R^x;
+   cout << "R^x=" << result << endl;
 
-   
-   MvecS Rdx = R&x;
-   MvecS Rwx = R^x;
-   cout << "\nR&x= " << Rdx << endl;
-   cout << "\nR^x=" << Rwx << endl;
-   
-   MvecS za = R*x;
-   MvecS zza = za&~R;
-   MvecS zzb = za^~R;
-   MvecS zb = za*~R;
-   cout << "\nRx= " << za << endl;
-   cout << "\n~R=" << ~R << endl;
-   cout << "\nRx&~R= " << zza << endl;
-   cout << "\nRx^~R= " << zzb << endl;
-   cout << "\nRx~R= " << zb << endl;
-   
-   MvecS  z = (x^t);
-   cout << "x^t = " << z << endl;
-   
-   MvecS wz = z*(-I);
-   cout << "(x^t)I=" << wz << endl;
-   
-   MvecS g1 = R*wz;
-   MvecS g2 = g1*(~R);
-   
-   cout << "R(x^t)I~R=" << g2 << endl;
+   result = R*x;
+   cout << "R*x=" << result << endl;
 
-   MvecS g3 = g2&w;
+   result = R^x+R&x;
+   cout << "R*x=" << result << endl;
+
+   result = R*x*~R;
+   cout << "R*x*~R=" << result << endl;
+
+   result = (R*((x^t)*(-I))*~R)&w;
    
-   cout << "Total: " << g3 << endl;
-   
+   cout << "R(x^t)(-I)~R&w=" << result << endl;
+
    return 0;
 }
