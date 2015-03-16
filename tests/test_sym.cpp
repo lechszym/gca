@@ -37,17 +37,33 @@ int main(int argc, char **argv) {
    MvecS  w(bw);
    MvecS  I=MvecS::I(3);
    MvecS  R(br);
+   MvecS result;
    
    cout << "x = " << x << endl;
    cout << "w = " << w << endl;
    cout << "t = " << t << endl;
    cout << "I = " << I << endl;
-   cout << "R = " << R << endl << endl;
+   cout << "R = " << R << endl;
+   cout << "~R = " << ~R << endl << endl;
 
    
-   MvecS result = R&x;
+   result = R&(~R);
+   cout << "R&~R=" << result << endl;
+
+   return 0;
+   
+   result = R^(~R);
+   cout << "R^~R=" << result << endl;
+   
+   
+   result = R*(~R);
+   cout << "R*~R=" << result << endl;
+   
+   
+   result = R&x;
    cout << "R&x= " << result << endl;
 
+   
    result = R^x;
    cout << "R^x=" << result << endl;
 
@@ -56,7 +72,7 @@ int main(int argc, char **argv) {
 
    result = (R^x)+(R&x);
    cout << "R*x=" << result << endl;
-
+   
    result = R*x*~R;
    cout << "R*x*~R=" << result << endl;
 
@@ -64,5 +80,20 @@ int main(int argc, char **argv) {
    
    cout << "R(x^t)(-I)~R&w=" << result << endl;
 
+   
+   BladeS   be1(1,1);
+   BladeS   be2(1,2);
+   BladeS   be3(1,3);
+   
+   MvecS R1 = R*be1*~R;
+   MvecS R2 = R*be2*~R;
+   MvecS R3 = R*be3*~R;
+   //ma = ma / ma;
+   
+   cout << R1 << endl;
+   cout << R2 << endl;
+   cout << R3 << endl;
+   
+   
    return 0;
 }

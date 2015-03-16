@@ -122,6 +122,7 @@ namespace gca {
          for (std::size_t n = 0; n < N; n++) {
             std::size_t ia = n / Nb;
             std::size_t ib = n % Nb;
+            std::cout << "(" << a->at(ia) << "&" << b->at(ib) << ")=" << (a->at(ia) ^ b->at(ib)) << "\n";
             result += (a->at(ia) & b->at(ib));
          }
          return result;
@@ -193,7 +194,7 @@ namespace gca {
 
          Mvec result;
          for(std::size_t i=0;i<_blades.size();i++) {
-            Blade<T> b = _blades[i].get() * v;
+            Blade<T> b = _blades[i].get() / v;
             T vtemp = b.get();
             if(vtemp > GCA_PRECISION || vtemp < (-GCA_PRECISION)) {
                result._blades.push_back(b);
@@ -237,10 +238,10 @@ namespace gca {
          return result;
       }
 
-      double mag(void) const {
-         double m = 0;
+      T mag(void) const {
+         T m(0.0);
          for (std::size_t i = 0; i < _blades.size(); i++) {
-            m += _blades[i].mag();
+            m = (m+_blades[i].mag());
          }
          return m;
       }

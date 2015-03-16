@@ -226,6 +226,22 @@ namespace gca {
          return result;
       }
 
+    /*Sym operator/(const Sym& b) const {
+
+         Sym result;
+
+         for (std::size_t i = 0; i < _sum.size(); i++) {
+            for (std::size_t j = 0; j < b._sum.size(); j++) {
+               Mult m = _sum[i] / b._sum[j];
+               if (!(m == 0.0)) {
+                  result += m;
+               }
+            }
+         }
+         std::sort(result._sum.begin(), result._sum.end(), Sym::compByMult);
+         return result;
+      }*/      
+      
       Sym& operator+=(const Mult& m) {
          if (m == 0.0) {
             return *this;
@@ -271,6 +287,7 @@ namespace gca {
          }
       }
 
+      
       bool operator==(double x) const {
          if (_sum.empty()) {
             return true;
