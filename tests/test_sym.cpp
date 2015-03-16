@@ -50,8 +50,6 @@ int main(int argc, char **argv) {
    result = R&(~R);
    cout << "R&~R=" << result << endl;
 
-   return 0;
-   
    result = R^(~R);
    cout << "R^~R=" << result << endl;
    
@@ -73,12 +71,24 @@ int main(int argc, char **argv) {
    result = (R^x)+(R&x);
    cout << "R*x=" << result << endl;
    
-   result = R*x*~R;
+   result = R*x*(~R);
    cout << "R*x*~R=" << result << endl;
 
-   result = (R*((x^t)*(-I))*~R)&w;
+   result = x^t;
+   cout << "x^t=" << result << endl;
+
+   result = result*(-I);
+   cout << "(x^t)(-I)=" << result << endl;
+
+   result = R*result;
+   cout << "R(x^t)=" << result << endl;
+
+   result = result&(~R);
+   cout << "R(x^t)(-I)&~R=" << result << endl;
    
-   cout << "R(x^t)(-I)~R&w=" << result << endl;
+   result = result&w;
+   
+   cout << "(R(x^t)(-I)~R)&w=" << result << endl;
 
    
    BladeS   be1(1,1);
@@ -90,9 +100,9 @@ int main(int argc, char **argv) {
    MvecS R3 = R*be3*~R;
    //ma = ma / ma;
    
-   cout << R1 << endl;
-   cout << R2 << endl;
-   cout << R3 << endl;
+   //cout << R1 << endl;
+   //cout << R2 << endl;
+   //cout << R3 << endl;
    
    
    return 0;

@@ -22,17 +22,17 @@ namespace gca {
       }
 
       Blade(T v) {
-         _v = v;
+         _v = fix_precision(v);
       }
 
       Blade(T v, unsigned long e) {
          _e.push_back(e);
-         _v = v;
+         _v = fix_precision(v);
       }
 
       Blade(T v, const ebase_t &e) {
          _e = e;
-         _v = v;
+         _v = fix_precision(v);
       }
 
       Blade(const Blade& orig) {
@@ -49,7 +49,7 @@ namespace gca {
       }
 
       void set(T v) {
-         _v = v;
+         _v = fix_precision(v);
       }
 
       T get(void) const {
@@ -85,7 +85,8 @@ namespace gca {
 
          unsigned int iA = eA->size();
          unsigned int iB = 0;
-
+         unsigned int flip;
+         
          ebase_t::const_iterator eA_iter = eA->begin();
          ebase_t::const_iterator eB_iter = eB->begin();
 
@@ -106,11 +107,7 @@ namespace gca {
                eB_iter++;
             } else {
                iA--;
-               unsigned int flip = iA % 2;
-               if (flip != 0) {
-                  sign *= -1;
-               }
-               flip = iB % 2;
+               flip = iA % 2;
                if (flip != 0) {
                   sign *= -1;
                }
@@ -118,6 +115,11 @@ namespace gca {
                eA_iter++;
                eB_iter++;
             }
+            flip = iB % 2;
+            if (flip != 0) {
+               sign *= -1;
+            }
+
          }
 
          if (!common) {

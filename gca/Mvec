@@ -2,7 +2,7 @@
 #include "../src/Sym.h"
 
 namespace gca {
-
+    
     typedef Blade<int> Bladei;
     typedef Mvec<int>  Mveci;
 
