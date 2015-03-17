@@ -124,7 +124,7 @@ namespace gca {
                 //}
                 std::size_t ia = n / Nb;
                 std::size_t ib = n % Nb;
-                //std::cout << "(" << a->at(ia) << "&" << b->at(ib) << ")=";
+                //std::cout << "(" << a->at(ia) << ")&(" << b->at(ib) << ")=";
                 //std::cout << (a->at(ia) & b->at(ib)) << "\n";
                 result += (a->at(ia) & b->at(ib));
                 //std::cout << "result: " << result << "\n";
@@ -165,8 +165,20 @@ namespace gca {
             for (std::size_t n = 0; n < N; n++) {
                 std::size_t ia = n / Nb;
                 std::size_t ib = n % Nb;
-                result += (a->at(ia) & b->at(ib));
-                result += (a->at(ia) ^ b->at(ib));
+                //Blade<T> c = (a->at(ia) ^ b->at(ib));
+                //if(c == 0.0) {
+                //   c = (a->at(ia) & b->at(ib));
+                //}
+                if(Blade<T>::common(a->at(ia), b->at(ib))) {
+                  //std::cout << "(" << a->at(ia) << ")&(" << b->at(ib) << ")=";
+                  //std::cout << (a->at(ia) & b->at(ib)) << "\n";           
+                  result += (a->at(ia) & b->at(ib));
+                } else {
+                  //std::cout << "(" << a->at(ia) << ")^(" << b->at(ib) << ")=";
+                  //std::cout << (a->at(ia) ^ b->at(ib)) << "\n";
+                  result += (a->at(ia) ^ b->at(ib));
+                }
+                //std::cout << "result= " << result << "\n";
             }
             return result;
         }
@@ -199,7 +211,7 @@ namespace gca {
 
             Mvec result;
             for (std::size_t i = 0; i < _blades.size(); i++) {
-                Blade<T> b = _blades[i].get() / vf;
+                Blade<T> b = _blades[i] / vf;
                 if (b.get() != 0.0) {
                     result._blades.push_back(b);
                 }
@@ -258,6 +270,15 @@ namespace gca {
                 result->_blades.push_back(_blades[i].conj());
             }
             return *result;
+        }
+
+        static Mvec norm(const Mvec &m) {
+           return (m/std::sqrt(m.mag()));
+        }
+
+        
+        Mvec norm() const {
+           return norm(*this);
         }
 
         std::string toString() {

@@ -44,6 +44,9 @@ int main(int argc, char **argv) {
    Mvecd mv(v);
    
    cout << mv << endl;
+   Mvecd z = mv.norm();
+   cout << "Norm" << z << endl;
+   
    
    Mvecd mv2 = mv*mv;
    

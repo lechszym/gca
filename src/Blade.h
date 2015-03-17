@@ -55,7 +55,45 @@ namespace gca {
       T get(void) const {
          return _v;
       }
+      
+      static bool common(const Blade &A, const Blade &B) {
 
+         const ebase_t *eA = &A._e;
+         const ebase_t *eB = &B._e;
+
+         // Check if any of the numbers is a scalar
+         if (eA->empty()) {
+            if (eB->empty()) {
+               return true;
+            } else {
+               return false;
+            }
+         } else if (eB->empty()) {
+            // Outer product of scalar and non-zero grade blade
+            // is a scalar multiple of that blade
+            return false;
+         }         
+       
+         ebase_t::const_iterator eA_iter = eA->begin();
+         ebase_t::const_iterator eB_iter = eB->begin();
+
+         while (true) {
+            if (eA_iter == eA->end()) {
+               break;
+            } else if (eB_iter == eB->end()) {
+               break;
+            } else if (*eA_iter < *eB_iter) {
+               eA_iter++;
+            } else if (*eA_iter > *eB_iter) {
+               eB_iter++;
+            } else {
+               return true;
+            }
+         }
+         
+         return false;
+      }
+      
       Blade& inner(const Blade &B) const {
 
          const ebase_t *eA = &_e;
@@ -80,8 +118,10 @@ namespace gca {
          int sign = 1;
          bool common = false;
 
-         ebase_t* eC = new ebase_t();
-         eC->reserve(eA->size() + eB->size());
+         ebase_t eC;
+         ebase_t eD;
+         eC.reserve(eA->size());
+         eD.reserve(eB->size());
 
          unsigned int iA = eA->size();
          unsigned int iB = 0;
@@ -92,17 +132,17 @@ namespace gca {
 
          while (true) {
             if (eA_iter == eA->end()) {
-               eC->insert(eC->end(), eB_iter, eB->end());
+               eD.insert(eD.end(), eB_iter, eB->end());
                break;
             } else if (eB_iter == eB->end()) {
-               eC->insert(eC->end(), eA_iter, eA->end());
+               eC.insert(eC.end(), eA_iter, eA->end());
                break;
             } else if (*eA_iter < *eB_iter) {
-               eC->push_back(*eA_iter);
+               eC.push_back(*eA_iter);
                iA--;
                eA_iter++;
             } else if (*eA_iter > *eB_iter) {
-               eC->push_back(*eB_iter);
+               eD.push_back(*eB_iter);
                iB++;
                eB_iter++;
             } else {
@@ -111,25 +151,29 @@ namespace gca {
                if (flip != 0) {
                   sign *= -1;
                }
+               flip = iB % 2;
+               if (flip != 0) {
+                  sign *= -1;
+               }
                common = true;
                eA_iter++;
                eB_iter++;
             }
-            flip = iB % 2;
-            if (flip != 0) {
-               sign *= -1;
-            }
-
          }
 
          if (!common) {
-            delete(eC);
             return *(new Blade());
+         } else if(eC.empty()) {
+            if(eD.empty()) {
+               return *(new Blade(_v * sign * B._v));
+            } else {
+               return *(new Blade(_v * sign * B._v, eD));
+            }            
+         } else if(eD.empty()) {
+            return *(new Blade(_v * sign * B._v, eC));
+         } else {
+            return Blade(_v * sign, eC).outer(Blade(B._v, eD));
          }
-
-         Blade *C = new Blade(_v * B._v * sign, *eC);
-         delete(eC);
-         return *C;
       }
 
       Blade& outer(const Blade &B) const {

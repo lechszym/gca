@@ -48,14 +48,14 @@ int main(int argc, char **argv) {
 
    
    result = R&(~R);
-   cout << "R&~R=" << result << endl;
+   cout << "\nR&~R=" << result << endl;
 
    result = R^(~R);
-   cout << "R^~R=" << result << endl;
+   cout << "\nR^~R=" << result << endl;
    
    
    result = R*(~R);
-   cout << "R*~R=" << result << endl;
+   cout << "\nR*~R=" << result << endl;
    
    
    result = R&x;
@@ -66,43 +66,47 @@ int main(int argc, char **argv) {
    cout << "R^x=" << result << endl;
 
    result = R*x;
-   cout << "R*x=" << result << endl;
+   cout << "\nR*x=" << result << endl;
 
    result = (R^x)+(R&x);
-   cout << "R*x=" << result << endl;
+   cout << "\nR*x=" << result << endl;
    
    result = R*x*(~R);
-   cout << "R*x*~R=" << result << endl;
+   cout << "\nR*x*~R=" << result << endl;
 
    result = x^t;
-   cout << "x^t=" << result << endl;
+   cout << "\nx^t=" << result << endl;
 
    result = result*(-I);
-   cout << "(x^t)(-I)=" << result << endl;
+   cout << "\n(x^t)(-I)=" << result << endl;
 
    result = R*result;
-   cout << "R(x^t)=" << result << endl;
+   cout << "\nR(x^t)=" << result << endl;
 
    result = result&(~R);
-   cout << "R(x^t)(-I)&~R=" << result << endl;
+   cout << "\nR(x^t)(-I)&~R=" << result << endl;
    
    result = result&w;
    
-   cout << "(R(x^t)(-I)~R)&w=" << result << endl;
+   cout << "\n(R(x^t)(-I)~R)&w=" << result << endl;
 
    
    BladeS   be1(1,1);
    BladeS   be2(1,2);
    BladeS   be3(1,3);
    
-   MvecS R1 = R*be1*~R;
-   MvecS R2 = R*be2*~R;
-   MvecS R3 = R*be3*~R;
-   //ma = ma / ma;
    
-   //cout << R1 << endl;
-   //cout << R2 << endl;
-   //cout << R3 << endl;
+   cout << "\n\nMultiplying:\n";
+   
+   MvecS R1 = (R*be1)*~R;
+   MvecS R2 = (R*be2)*~R;
+   MvecS R3 = (R*be3)*~R;
+
+
+   cout << "R1=" << R1 << endl;
+   cout << "R2=" << R2 << endl;
+   cout << "R3=" << R3 << endl;
+   
    
    
    return 0;
