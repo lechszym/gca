@@ -53,10 +53,9 @@ public:
                 this->_blades.push_back(gca::Blade<T>(*v));
             } else {
                 for (size_t l = 0; l < L; l++) {
-                    this->_blades.push_back(gca::Blade<T>(*v++, l + 1));
+                    *this += gca::Blade<T>(*v++, l + 1);
                 }
             }
-            this->prune();
         }
     }
 
