@@ -1,6 +1,5 @@
 #include "../src/Mvec.h"
 #include "../src/Sym.h"
-#include "../src/Rotor.h"
 
 namespace gca {
     
