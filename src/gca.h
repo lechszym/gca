@@ -12,16 +12,12 @@
 
 namespace gca {
     
-#ifndef GCA_PRECISION
-#define GCA_PRECISION  1e-12
+#ifndef GCA_ZERO
+#define GCA_ZERO  1e-12
 #endif
 
-#ifndef GCA_PRECISION
-#define GCA_PRECISION  1e-12
-#endif
-
-inline  double fix_precision(double x) {
-    if( (x < GCA_PRECISION) && (x > -GCA_PRECISION)) {
+inline  double check_precision_for_zero(double x) {
+    if( (x < GCA_ZERO) && (x > -GCA_ZERO)) {
         return 0.0;
     } else {
         return x;

@@ -185,7 +185,7 @@ namespace gca {
 
         Mvec operator*(const T v) const {
             Mvec result;
-            T vf = fix_precision(v);
+            T vf = check_precision_for_zero(v);
             if (vf != 0.0) {
                 for (std::size_t i = 0; i < _blades.size(); i++) {
                     Blade<T> b = _blades[i] * vf;
@@ -204,7 +204,7 @@ namespace gca {
         }
 
         Mvec operator/(const T v) const {
-            T vf = fix_precision(v);
+            T vf = check_precision_for_zero(v);
             if(vf == 0.0) {
                 return Mvec();
             }
@@ -230,7 +230,7 @@ namespace gca {
         Mvec operator+(const T v) const {
 
             Mvec result(*this);
-            T vf = fix_precision(v);
+            T vf = check_precision_for_zero(v);
             
             if (vf != 0.0) {
                 result += Blade<T>(vf);
@@ -248,7 +248,7 @@ namespace gca {
 
         Mvec operator-(const T v) const {
             Mvec result(*this);
-            T vf = fix_precision(v);
+            T vf = check_precision_for_zero(v);
             
             if (vf != 0.0) {
                 result += Blade<T>(-vf);
@@ -346,11 +346,11 @@ namespace gca {
                 double vA = _blades[i].get();
                 double vB = m._blades[i].get();
 
-                if (vA > vB + GCA_PRECISION) {
+                if (vA > vB + GCA_ZERO) {
                     return false;
                 }
 
-                if (vA < vB - GCA_PRECISION) {
+                if (vA < vB - GCA_ZERO) {
                     return false;
                 }
 

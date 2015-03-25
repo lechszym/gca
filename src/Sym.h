@@ -35,7 +35,7 @@ namespace gca {
         }
 
         Mult(const double v) {
-            _v = fix_precision(v);
+            _v = check_precision_for_zero(v);
         }
 
         Mult(const char s[]) {
@@ -53,7 +53,7 @@ namespace gca {
         }
 
         Mult& operator*=(const double x) {
-            _v = fix_precision(_v * x);
+            _v = check_precision_for_zero(_v * x);
             if(_v == 0.0) {
                 _mult.clear();
             }
@@ -62,7 +62,7 @@ namespace gca {
 
         Mult& operator*=(const Mult& m) {
 
-            _v = fix_precision(_v * m._v);
+            _v = check_precision_for_zero(_v * m._v);
             if(_v == 0.0) {
                 _mult.clear();
             } else if (_mult.empty()) {
@@ -100,7 +100,7 @@ namespace gca {
 
         Mult operator*(const double x) const {
             Mult result = Mult(*this);
-            result._v = fix_precision(result._v * x);
+            result._v = check_precision_for_zero(result._v * x);
             return result;
         }
 
@@ -202,7 +202,7 @@ namespace gca {
 
                 while (si != _sum.end()) {
                     if (Mult::equalSym(si->_mult,m._mult)) {
-                        si->_v = fix_precision(si->_v + m._v);
+                        si->_v = check_precision_for_zero(si->_v + m._v);
                         if (si->_v == 0.0) {
                             _sum.erase(si);
                         }
@@ -371,7 +371,7 @@ namespace gca {
         return m + Sym(v);
     }
     
-    inline Sym fix_precision(const Sym& m) {
+    inline Sym check_precision_for_zero(const Sym& m) {
         return m;
     }
 }

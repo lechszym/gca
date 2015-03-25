@@ -41,7 +41,7 @@ namespace gca {
        * @param v - scalar value
        */      
       Blade(T v) {
-         _v = fix_precision(v);
+         _v = check_precision_for_zero(v);
       }
 
       /**
@@ -52,7 +52,7 @@ namespace gca {
        */
       Blade(T v, unsigned long e) {
          _e.push_back(e);
-         _v = fix_precision(v);
+         _v = check_precision_for_zero(v);
       }
 
       /**
@@ -63,7 +63,7 @@ namespace gca {
        */
       Blade(T v, const ebase_t &e) {
          _e = e;
-         _v = fix_precision(v);
+         _v = check_precision_for_zero(v);
       }
 
       /**
@@ -107,7 +107,7 @@ namespace gca {
        * @param v set value of the blade
        */
       void set(T v) {
-         _v = fix_precision(v);
+         _v = check_precision_for_zero(v);
       }
 
       /**
