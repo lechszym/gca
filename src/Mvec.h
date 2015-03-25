@@ -407,7 +407,65 @@ namespace gca {
         }
     }
 #endif
+    
+    template <typename T>
+    inline Mvec<T> operator+(T v, const Mvec<T>& m) {
+        return m + v;
+    }    
 
+    template <typename T>
+    inline Mvec<T> operator-(T v, const Mvec<T>& m) {
+        return m - v;
+    }    
+    
+    template <typename T>
+    inline Mvec<T> VecBase(T v, unsigned int e1) {
+       return Mvec<T>(v,e1);
+    }
+
+    
+    template <typename T>
+    inline Mvec<T> BivecBase(T v, unsigned int e1, unsigned int e2) {
+       Mvec<T> b1;
+       Mvec<T> b2;
+       if(e1 > e2) {
+          v *= -1;
+          b1 = Mvec<T>(-v,e2);
+          b2 = Mvec<T>(1,e1);
+       } else {
+          b1 = Mvec<T>(v,e1);
+          b2 = Mvec<T>(1,e2);
+                  
+       }
+       return b1*b2;
+    }
+
+    template <typename T>
+    inline Mvec<T> Rotor(const Mvec<T> &n, const Mvec<T> &m) {
+           Mvec<T> _n =  n[1];
+           Mvec<T> _m =  m[1];
+           
+           _n = _n.norm();
+           _m = _m.norm();
+           
+           return _n*_m;
+        }
+
+    inline Mvec<double> Rotor(double angleX, double angleY, double angleZ, bool radians=true) {
+       if(~radians) {
+          angleX /= 180 * M_PI;
+          angleY /= 180 * M_PI;
+          angleZ /= 180 * M_PI;
+       }
+           
+       Mvec<double> Rx = cos(angleX/2)-BivecBase(sin(angleX/2),2,3);
+       Mvec<double> Ry = cos(angleY/2)-BivecBase(sin(angleY/2),1,3);
+       Mvec<double> Rz = cos(angleZ/2)-BivecBase(sin(angleZ/2),1,2);
+       
+       return Rx*Ry*Rz;
+   }    
+    
+    
 }
 
 #endif	/* MVEC_H */

@@ -13,97 +13,184 @@ namespace gca {
 
    typedef std::vector<unsigned long> ebase_t;
 
+   /**
+    * This class represents a GA blade of value with arbitrary grade.  The grade
+    * is stored as a vector of base values - from 1 to N.  Scalar blade's base
+    * is empty (considered to have base value of 0).  
+    * 
+    * The base vector is always sorted from smallest to largest - makes the
+    * iteration and comparisoin of blades easier.  The sign of the value of the
+    * blade is flipped to be consistent with the order.
+    */
+   
    template <typename T>
    class Blade {
    public:
 
+      
+      /**
+       * Initialises blade with a scalar value of zero
+       */
       Blade() : _e() {
          _v = T(0.0);
       }
 
+      /**
+       * Initialises blade with a scalar value of v
+       * 
+       * @param v - scalar value
+       */      
       Blade(T v) {
          _v = fix_precision(v);
       }
 
+      /**
+       * Initialises blade with a single-grade base
+       * 
+       * @param v - value
+       * @param e - base vector
+       */
       Blade(T v, unsigned long e) {
          _e.push_back(e);
          _v = fix_precision(v);
       }
 
+      /**
+       * Initialises blade with a multi-grade base
+       * 
+       * @param v - value
+       * @param e - base vector
+       */
       Blade(T v, const ebase_t &e) {
          _e = e;
          _v = fix_precision(v);
       }
 
+      /**
+       * Deep copy of the blade
+       * 
+       * @param orig
+       */
       Blade(const Blade& orig) {
          _v = orig._v;
          _e = orig._e;
       }
 
+      /**
+       * Destructor
+       */
       virtual ~Blade() {
 
       }
 
+      /**
+       * Grade getter
+       * 
+       * @return grade of the blade
+       */
       unsigned int grade() const {
          return _e.size();
       }
 
-      void set(T v) {
-         _v = fix_precision(v);
-      }
-
+      /**
+       * Value getter
+       * 
+       * @return value of the blade
+       */
       T get(void) const {
          return _v;
       }
       
+      /**
+       * Value setter
+       * 
+       * @param v set value of the blade
+       */
+      void set(T v) {
+         _v = fix_precision(v);
+      }
+
+      /**
+       * Check for common bases between two blades
+       * @param A first blade
+       * @param B second blade
+       * @return true if blades have a common base, false otherwise
+       * 
+       * Scalar blades are treated as blades with base 0, non-scalara blades
+       * are blades with non-zero bases.  Hence, two scalar blades
+       * are sharing a base, whears a scalar and non-scalara blades
+       * do not share a base.
+       */
       static bool common(const Blade &A, const Blade &B) {
 
+         // Get pointers to blade bases
          const ebase_t *eA = &A._e;
          const ebase_t *eB = &B._e;
 
-         // Check if any of the numbers is a scalar
+         // First check, if any of the blades is a scalar
+         
+         // If A is a scalar...
          if (eA->empty()) {
+            //.. and B is scalar as well, then they share a base
             if (eB->empty()) {
                return true;
+            //...and B is not a scalara, then they do not share a base
             } else {
                return false;
             }
+         // Else if A is not a scalara but B is, then the blades do not share
+         // a base
          } else if (eB->empty()) {
-            // Outer product of scalar and non-zero grade blade
-            // is a scalar multiple of that blade
             return false;
          }         
        
+         // Both blades are non-scalars
+         
+         // Iterate over blade bases.  If common one is found, return true.
+         // If iteration finishes without finidng common base, retur false.
          ebase_t::const_iterator eA_iter = eA->begin();
          ebase_t::const_iterator eB_iter = eB->begin();
-
          while (true) {
             if (eA_iter == eA->end()) {
+               // No more bases in A, exit
                break;
             } else if (eB_iter == eB->end()) {
+               // No more bases in B, exit
                break;
             } else if (*eA_iter < *eB_iter) {
+               // A base is smaller than B base, go to next A base
                eA_iter++;
             } else if (*eA_iter > *eB_iter) {
+               // B base is smaller than A base, go to next B base
                eB_iter++;
             } else {
+               // Bases are the same - found common base
                return true;
             }
          }
          
+         // Did not find common base
          return false;
       }
       
-      Blade& inner(const Blade &B) const {
+      /**
+       * Inner product of two blades
+       * 
+       * @param A First blade
+       * @param B Second blade
+       * @return Result blade of inner product of A and B
+       */
+      static Blade& inner(const Blade &A, const Blade &B) {
 
-         const ebase_t *eA = &_e;
+         // Get pointers to blade bases
+         const ebase_t *eA = &A._e;
          const ebase_t *eB = &B._e;
 
-         // Check if any of the numbers is a scalar
+         // Check if any of the blades is a scalar
          if (eA->empty()) {
             if (eB->empty()) {
                // Inner product of two scalars is their scalar multiple
-               return *(new Blade(_v * B._v, *eA));
+               return *(new Blade(A._v * B._v, *eA));
             } else {
                // Inner product of scalar and non-zero grade blade
                // is zero
@@ -165,20 +252,20 @@ namespace gca {
             return *(new Blade());
          } else if(eC.empty()) {
             if(eD.empty()) {
-               return *(new Blade(_v * sign * B._v));
+               return *(new Blade(A._v * sign * B._v));
             } else {
-               return *(new Blade(_v * sign * B._v, eD));
+               return *(new Blade(A._v * sign * B._v, eD));
             }            
          } else if(eD.empty()) {
-            return *(new Blade(_v * sign * B._v, eC));
+            return *(new Blade(A._v * sign * B._v, eC));
          } else {
-            return Blade(_v * sign, eC).outer(Blade(B._v, eD));
+            return Blade::outer(Blade(A._v * sign, eC),Blade(B._v, eD));
          }
       }
 
-      Blade& outer(const Blade &B) const {
+      static Blade& outer(const Blade &A, const Blade &B) {
 
-         const ebase_t *eA = &_e;
+         const ebase_t *eA = &A._e;
          const ebase_t *eB = &B._e;
 
          // Check if any of the numbers is a scalar
@@ -189,12 +276,12 @@ namespace gca {
             } else {
                // Outer product of scalar and non-zero grade blade
                // is a scalar multiple of that blade
-               return *(new Blade(_v * B._v, *eB));
+               return *(new Blade(A._v * B._v, *eB));
             }
          } else if (eB->empty()) {
             // Outer product of scalar and non-zero grade blade
             // is a scalar multiple of that blade
-            return *(new Blade(_v * B._v, _e));
+            return *(new Blade(A._v * B._v, A._e));
          }
 
          int sign = 1;
@@ -232,7 +319,7 @@ namespace gca {
             }
          }
 
-         Blade *C = new Blade(_v * B._v * sign, *eC);
+         Blade *C = new Blade(A._v * B._v * sign, *eC);
          delete(eC);
          return *C;
 
@@ -257,7 +344,7 @@ namespace gca {
             of a blade and its conjugate
             mag = A&(~A) */
 
-         Blade result = this->inner(this->conj());
+         Blade result = Blade::inner(*this,this->conj());
          return result._v;
       }
 
@@ -297,11 +384,11 @@ namespace gca {
       }
 
       Blade operator&(const Blade& B) const {
-         return this->inner(B);
+         return Blade::inner(*this,B);
       }
 
       Blade operator^ (const Blade& B) const {
-         return this->outer(B);
+         return Blade::outer(*this,B);
       }
 
       Blade operator/(T x) const {

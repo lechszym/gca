@@ -6,7 +6,7 @@ using namespace gca;
 
 int main(int argc, char **argv) {
    
-   Rotor<double> R(0,36,0,false);
+   Mvec<double> R = Rotor(0,36,0,false);
    
    cout << "R=" << R << "\n";
    
