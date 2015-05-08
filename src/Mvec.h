@@ -264,12 +264,12 @@ namespace gca {
             return m;
         }
 
-        Mvec& conj() const {
-            Mvec *result = new Mvec();
+        Mvec conj() const {
+            Mvec result;
             for (std::size_t i = 0; i < _blades.size(); i++) {
-                result->_blades.push_back(_blades[i].conj());
+                result._blades.push_back(_blades[i].conj());
             }
-            return *result;
+            return result;
         }
 
         static Mvec norm(const Mvec &m) {
@@ -317,7 +317,7 @@ namespace gca {
 
         }
 
-        Mvec& operator~(void) {
+        Mvec operator~(void) {
             return this->conj();
         }
 

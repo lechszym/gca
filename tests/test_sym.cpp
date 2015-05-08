@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
    cout << "t = " << t << endl;
    cout << "I = " << I << endl;
    cout << "R = " << R << endl;
-   cout << "~R = " << ~R << endl << endl;
+   //cout << "~R = " << ~R << endl << endl;
 
    
    result = R&(~R);

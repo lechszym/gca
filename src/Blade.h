@@ -180,7 +180,7 @@ namespace gca {
        * @param B Second blade
        * @return Result blade of inner product of A and B
        */
-      static Blade& inner(const Blade &A, const Blade &B) {
+      static Blade inner(const Blade &A, const Blade &B) {
 
          // Get pointers to blade bases
          const ebase_t *eA = &A._e;
@@ -190,16 +190,16 @@ namespace gca {
          if (eA->empty()) {
             if (eB->empty()) {
                // Inner product of two scalars is their scalar multiple
-               return *(new Blade(A._v * B._v, *eA));
+               return Blade(A._v * B._v, *eA);
             } else {
                // Inner product of scalar and non-zero grade blade
                // is zero
-               return *(new Blade());
+               return Blade();
             }
          } else if (eB->empty()) {
             // Inner product of scalar and non-zero grade blade
             // is zero
-            return *(new Blade());
+            return Blade();
          }
 
          int sign = 1;
@@ -249,21 +249,21 @@ namespace gca {
          }
 
          if (!common) {
-            return *(new Blade());
+            return Blade();
          } else if(eC.empty()) {
             if(eD.empty()) {
-               return *(new Blade(A._v * sign * B._v));
+               return Blade(A._v * sign * B._v);
             } else {
-               return *(new Blade(A._v * sign * B._v, eD));
+               return Blade(A._v * sign * B._v, eD);
             }            
          } else if(eD.empty()) {
-            return *(new Blade(A._v * sign * B._v, eC));
+            return Blade(A._v * sign * B._v, eC);
          } else {
             return Blade::outer(Blade(A._v * sign, eC),Blade(B._v, eD));
          }
       }
 
-      static Blade& outer(const Blade &A, const Blade &B) {
+      static Blade outer(const Blade &A, const Blade &B) {
 
          const ebase_t *eA = &A._e;
          const ebase_t *eB = &B._e;
@@ -272,16 +272,16 @@ namespace gca {
          if (eA->empty()) {
             if (eB->empty()) {
                // Outer product of two scalars is zero
-               return *(new Blade());
+               return Blade();
             } else {
                // Outer product of scalar and non-zero grade blade
                // is a scalar multiple of that blade
-               return *(new Blade(A._v * B._v, *eB));
+               return Blade(A._v * B._v, *eB);
             }
          } else if (eB->empty()) {
             // Outer product of scalar and non-zero grade blade
             // is a scalar multiple of that blade
-            return *(new Blade(A._v * B._v, A._e));
+            return Blade(A._v * B._v, A._e);
          }
 
          int sign = 1;
@@ -315,17 +315,17 @@ namespace gca {
             } else {
                // Common base, outer product is 0
                delete(eC);
-               return *(new Blade());
+               return Blade();
             }
          }
 
-         Blade *C = new Blade(A._v * B._v * sign, *eC);
+         Blade C(A._v * B._v * sign, *eC);
          delete(eC);
-         return *C;
+         return C;
 
       }
 
-      Blade& conj(void) const {
+      Blade conj(void) const {
          int sign = 1;
          unsigned int k = this->grade();
          if (k > 0) {
@@ -336,7 +336,7 @@ namespace gca {
             }
          }
 
-         return *(new Blade(_v * sign, _e));
+         return Blade(_v * sign, _e);
       }
 
       T mag(void) const {
@@ -348,11 +348,11 @@ namespace gca {
          return result._v;
       }
 
-      Blade& inv(void) const {
+      Blade inv(void) const {
          /* Inverse of a blade, it's the conjugate of 
             a blade divided by its magnitude 
             Ainv = ~A/(A&(~A)) */
-         return *(new Blade(this->conj() / this->mag()));
+         return Blade(this->conj() / this->mag());
       }
 
       std::string toString() const {
