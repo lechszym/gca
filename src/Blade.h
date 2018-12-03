@@ -19,11 +19,11 @@ namespace gca {
     * is empty (considered to have base value of 0).  
     * 
     * The base vector is always sorted from smallest to largest - makes the
-    * iteration and comparisoin of blades easier.  The sign of the value of the
+    * iteration and comparison of blades easier.  The sign of the value of the
     * blade is flipped to be consistent with the order.
     */
    
-   template <typename T>
+   template <typename T = float>
    class Blade {
    public:
 
@@ -64,8 +64,48 @@ namespace gca {
       Blade(T v, const ebase_t &e) {
          _e = e;
          _v = check_precision_for_zero(v);
+         sort_bases();
       }
 
+      
+       /**
+       * Initialises blade with a based derived from string;
+       * example string for blade of value 2 with bases 1^3
+       * is "2 e1^e3".
+       * 
+       * @param s - string
+       */
+      Blade(const char *s) {
+          
+          std::istringstream vs(s);
+
+          T v;
+
+          v = vs >> v ? v : 0;
+
+          _v = check_precision_for_zero(v);
+
+          const char *c=s;
+          bool basesSearch=false;
+          while(*c != 0) {
+              if(basesSearch) {
+                  if(*c==' ') {
+                      break;
+                  } else if(*c=='e') {
+                      std::istringstream es(c+1);
+                        
+                      int e;
+                      e = es >> e ? e : 0;
+                      _e.push_back(e);
+                  }                  
+              } else if(*c == ' ') {
+                  basesSearch=true;
+              } 
+              c++;
+          }
+          sort_bases();
+      }
+      
       /**
        * Deep copy of the blade
        * 
@@ -116,9 +156,9 @@ namespace gca {
        * @param B second blade
        * @return true if blades have a common base, false otherwise
        * 
-       * Scalar blades are treated as blades with base 0, non-scalara blades
+       * Scalar blades are treated as blades with base 0, non-scalar blades
        * are blades with non-zero bases.  Hence, two scalar blades
-       * are sharing a base, whears a scalar and non-scalara blades
+       * are sharing a base, whereas a scalar and non-scalar blades
        * do not share a base.
        */
       static bool common(const Blade &A, const Blade &B) {
@@ -129,25 +169,25 @@ namespace gca {
 
          // First check, if any of the blades is a scalar
          
-         // If A is a scalar...
          if (eA->empty()) {
-            //.. and B is scalar as well, then they share a base
+            // If A is a scalar...
             if (eB->empty()) {
+                //.. and B is scalar as well, then they share a base
                return true;
-            //...and B is not a scalara, then they do not share a base
             } else {
+                //...and B is not a scalar, then they do not share a base
                return false;
             }
-         // Else if A is not a scalara but B is, then the blades do not share
-         // a base
          } else if (eB->empty()) {
+             // Else if A is not a scalar but B is, then the blades do not share
+             // a base
             return false;
          }         
        
          // Both blades are non-scalars
          
          // Iterate over blade bases.  If common one is found, return true.
-         // If iteration finishes without finidng common base, retur false.
+         // If iteration finishes without finding a common base, return false.
          ebase_t::const_iterator eA_iter = eA->begin();
          ebase_t::const_iterator eB_iter = eB->begin();
          while (true) {
@@ -197,7 +237,7 @@ namespace gca {
                return Blade();
             }
          } else if (eB->empty()) {
-            // Inner product of scalar and non-zero grade blade
+            // Inner product of non-zero grade blade and scalar
             // is zero
             return Blade();
          }
@@ -462,6 +502,31 @@ namespace gca {
       }
 
    private:
+       
+       void sort_bases() {
+         
+           int sign = 1;
+           for(size_t i=0;i<_e.size();i++) {
+               int min_e = _e[i];
+               int min_k = i;
+               for(size_t j=i+1;j<_e.size();j++) {
+                   if(_e[j]<min_e) {
+                       min_e = _e[j];
+                       min_k=j;
+                   }
+               }
+               if(min_k != i) {
+                   int tmp = _e[i];
+                   _e[i] = _e[min_k];
+                   _e[min_k] = tmp;
+                   sign *= -1;                   
+               }
+           }
+           if(sign == -1) {
+               _v = -_v;
+           }
+       }
+       
 
    protected:
       ebase_t _e;

@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 
    int dim[14] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 21, 33, 58};
    double tot_time = 0;
-   vector<Bladed> blades[14];
+   vector<Blade<> > blades[14];
    //Bladed* blades[14];
 
    for (int i = 0; i < 14; i++) {
@@ -38,11 +38,11 @@ int main(int argc, char **argv) {
                clock_t begin;
                clock_t end;
 
-               Bladed A = blades[i][j];
-               Bladed B = blades[ii][jj];
-               Bladed nA = ~A;
-               Bladed nB = ~B;
-               Bladed C;
+               Blade<> A = blades[i][j];
+               Blade<> B = blades[ii][jj];
+               Blade<> nA = ~A;
+               Blade<> nB = ~B;
+               Blade<> C;
 
                begin = clock();
                C = A&B;

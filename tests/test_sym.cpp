@@ -6,29 +6,29 @@ using namespace gca;
 
 int main(int argc, char **argv) {
 
-   vector<BladeS> bx;
-   vector<BladeS> bt;
-   vector<BladeS> br;
-   vector<BladeS> bw;
+   vector<Blade<Sym>> bx;
+   vector<Blade<Sym>> bt;
+   vector<Blade<Sym>> br;
+   vector<Blade<Sym>> bw;
    char syms[] = {'1','2','3'};
    char buff[32];
    
-   br.push_back(BladeS(Sym("r_0")));
+   br.push_back(Blade<Sym>(Sym("r_0")));
    
    int k=0;
    for(unsigned int i=0;i<3;i++) {
        sprintf(buff,"x_%c", syms[i]);
-       bx.push_back(BladeS(Sym(buff),i+1));       
+       bx.push_back(Blade<Sym>(Sym(buff),i+1));       
        sprintf(buff,"w_%c", syms[i]);
-       bw.push_back(BladeS(Sym(buff),i+1));       
+       bw.push_back(Blade<Sym>(Sym(buff),i+1));       
        sprintf(buff,"t_%c", syms[i]);
-       bt.push_back(BladeS(Sym(buff),i+1));       
+       bt.push_back(Blade<Sym>(Sym(buff),i+1));       
        for(unsigned int j=i+1;j<3;j++) {
            vector<unsigned long> e;
            e.push_back(i+1);
            e.push_back(j+1);
            sprintf(buff,"r_%c", syms[k++]);
-           br.push_back(BladeS(Sym(buff),e));
+           br.push_back(Blade<Sym>(Sym(buff),e));
        }
    }
    
@@ -91,9 +91,9 @@ int main(int argc, char **argv) {
    cout << "\n(R(x^t)(-I)~R)&w=" << result << endl;
 
    
-   BladeS   be1(1,1);
-   BladeS   be2(1,2);
-   BladeS   be3(1,3);
+   Blade<Sym>   be1(1,1);
+   Blade<Sym>   be2(1,2);
+   Blade<Sym>   be3(1,3);
    
    
    cout << "\n\nMultiplying:\n";

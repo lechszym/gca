@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 
 project(gca)
 
+#set(CMAKE_CXX_STANDARD 17)
+#set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Makes sure that executables go to bin directory (respective to build dir)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
@@ -16,7 +19,7 @@ if(EIGEN_FOUND)
   add_definitions(-DEIGEN_ENABLED)
 endif(EIGEN_FOUND)
 
-set(CMAKE_CXX_FLAGS "-g -O3 -Wall -std=c++0x")
+set(CMAKE_CXX_FLAGS "-g -O0 -Wall -std=c++0x")
 
 find_package(OpenMP)
 if(OPENMP_FOUND)

@@ -27,7 +27,7 @@
 
 namespace gca {
 
-    template <typename T>
+    template <typename T = float>
     class Mvec {
     public:
 
@@ -38,7 +38,7 @@ namespace gca {
             _blades.push_back(b);
         }
 
-        Mvec(double v, unsigned long e) {
+        Mvec(T v, unsigned long e) {
             _blades.push_back(Blade<T>(v, e));
         }
 
@@ -362,7 +362,7 @@ namespace gca {
             return true;
         }
 
-        friend std::ostream& operator<<(std::ostream &out, Mvec &v) {
+        friend std::ostream& operator<<(std::ostream &out, Mvec<T> &v) {
             out << v.toString();
             return out;
         }
@@ -407,24 +407,35 @@ namespace gca {
         }
     }
 #endif
+
+    template <typename T = float>
+    inline Mvec<T> operator+(const Blade<T> b1, const Blade<T> b2) {
+        return Mvec<T>(b1)+Mvec<T>(b2);
+    }        
+
     
     template <typename T>
+    inline Mvec<T> operator*(Blade<T> b1, Blade<T> b2) {
+        return Mvec<T>(b1)*Mvec<T>(b2);
+    }        
+    
+    template <typename T = float>
     inline Mvec<T> operator+(T v, const Mvec<T>& m) {
         return m + v;
     }    
 
-    template <typename T>
+    template <typename T = float>
     inline Mvec<T> operator-(T v, const Mvec<T>& m) {
         return m - v;
     }    
     
-    template <typename T>
+    template <typename T = float>
     inline Mvec<T> VecBase(T v, unsigned int e1) {
        return Mvec<T>(v,e1);
     }
 
     
-    template <typename T>
+    template <typename T = float>
     inline Mvec<T> BivecBase(T v, unsigned int e1, unsigned int e2) {
        Mvec<T> b1;
        Mvec<T> b2;
@@ -440,7 +451,7 @@ namespace gca {
        return b1*b2;
     }
 
-    template <typename T>
+    template <typename T = float>
     inline Mvec<T> Rotor(const Mvec<T> &n, const Mvec<T> &m) {
            Mvec<T> _n =  n[1];
            Mvec<T> _m =  m[1];

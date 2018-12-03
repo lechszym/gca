@@ -6,7 +6,7 @@
 using namespace std;
 using namespace gca;
 
-Bladed generate_blade(unsigned int maxGrade, unsigned int minGrade, unsigned int maxBase) {
+Blade<float> generate_blade(unsigned int maxGrade, unsigned int minGrade, unsigned int maxBase) {
    
    vector<unsigned long> e;
    
@@ -38,12 +38,12 @@ Bladed generate_blade(unsigned int maxGrade, unsigned int minGrade, unsigned int
 
    double v = (double) (rand() % 200) - 100;      
    
-   return Bladed(v, e);
+   return Blade<float>(v, e);
 }
 
-Mvecd generate_mvec(unsigned int maxBladeds, unsigned int maxGrade, unsigned int minGrade) {
+Mvec<float> generate_mvec(unsigned int maxBladeds, unsigned int maxGrade, unsigned int minGrade) {
    
-   std::vector<Bladed> blades;
+   std::vector<Blade<float> > blades;
    
    unsigned long nblades = maxBladeds;
    if(maxBladeds > 1) {
@@ -52,12 +52,12 @@ Mvecd generate_mvec(unsigned int maxBladeds, unsigned int maxGrade, unsigned int
    
    unsigned long i=0;
    while(i < nblades) {
-      Bladed b = generate_blade(maxGrade, minGrade, maxBladeds);
-      std::vector<Bladed>::iterator bi = std::find(blades.begin(),blades.end(),b);
+      Blade<float> b = generate_blade(maxGrade, minGrade, maxBladeds);
+      std::vector<Blade<float> >::iterator bi = std::find(blades.begin(),blades.end(),b);
       if(bi == blades.end()) {
          blades.push_back(b);
          i++;
       }
    }
-   return Mvecd(blades);
+   return Mvec<float>(blades);
 }
