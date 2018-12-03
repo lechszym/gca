@@ -452,7 +452,7 @@ namespace gca {
         }
 
     inline Mvec<double> Rotor(double angleX, double angleY, double angleZ, bool radians=true) {
-       if(~radians) {
+       if(!radians) {
           angleX /= 180 * M_PI;
           angleY /= 180 * M_PI;
           angleZ /= 180 * M_PI;
