@@ -7,14 +7,13 @@ using namespace gca;
 
 int main(int argc, char **argv) {
     
-   Blade<> a("2 e1^e2");
+   Blade<float> a("2 e1^e2");
    
-   Blade<> b("4 e2");
+   Blade<float> b("4 e2");
    
-   Mvec<> r = a*b;
    cout << a << " & " << b << " = " << (a&b) << endl;
    cout << a << " ^ " << b << " = " << (a^b) << endl;
-   cout << a << " * " << b << " = " << (r) << endl;
+   cout << a << " * " << b << " = " << (a*b) << endl;
    
    Blade<> c = a&b;
    cout << "c= " << c << endl;

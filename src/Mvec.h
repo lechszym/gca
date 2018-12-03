@@ -281,21 +281,27 @@ namespace gca {
            return norm(*this);
         }
 
-        std::string toString() {
+        std::string toString() const {
             std::stringstream ss;
 
             if (_blades.empty()) {
                 ss << "0";
             } else {
-                sort(_blades.begin(), _blades.end());
-                for (std::size_t i = 0; i < _blades.size(); i++) {
+                std::vector<Blade<T> > blades=std::vector<Blade<T> >();
+            
+                for(std::size_t i=0;i<_blades.size();i++) {
+                    blades.push_back(_blades[i]);
+                } 
+            
+                std::sort(blades.begin(), blades.end());
+                for (std::size_t i = 0; i < blades.size(); i++) {
                     if (i) {
                         ss << " ";
-                        if (_blades[i].get() >= 0) {
+                        if (blades[i].get() >= 0) {
                             ss << "+";
                         }
                     }
-                    ss << _blades[i];
+                    ss << blades[i];
                 }
             }
             return ss.str();
@@ -362,7 +368,7 @@ namespace gca {
             return true;
         }
 
-        friend std::ostream& operator<<(std::ostream &out, Mvec<T> &v) {
+        friend std::ostream& operator<<(std::ostream &out, const Mvec<T> &v) {
             out << v.toString();
             return out;
         }

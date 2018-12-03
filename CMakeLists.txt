@@ -19,7 +19,7 @@ if(EIGEN_FOUND)
   add_definitions(-DEIGEN_ENABLED)
 endif(EIGEN_FOUND)
 
-set(CMAKE_CXX_FLAGS "-g -O0 -Wall -std=c++0x")
+set(CMAKE_CXX_FLAGS "-g -O0 -Wall -std=c++0x -no-pie")
 
 find_package(OpenMP)
 if(OPENMP_FOUND)

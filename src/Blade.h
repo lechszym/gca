@@ -507,8 +507,8 @@ namespace gca {
          
            int sign = 1;
            for(size_t i=0;i<_e.size();i++) {
-               int min_e = _e[i];
-               int min_k = i;
+               unsigned int min_e = _e[i];
+               unsigned int min_k = i;
                for(size_t j=i+1;j<_e.size();j++) {
                    if(_e[j]<min_e) {
                        min_e = _e[j];
