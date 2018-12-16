@@ -62,33 +62,40 @@ namespace gca {
           
 
           const char *c=s;
-          bool basesSearch=false;
-          bool pushBlade=false;
+          int mode=0;
+          int sign = 1;
           while(*c != 0) {
-              if(basesSearch) {
-                  if(*c==0 || *c==' ' || *c=='+' || *c=='-') {
+              if(mode==0) {
+                  if(isdigit(*c)) {
+                      s = c;
+                      mode = 1;
+                  } else if(*c == '-') {
+                      sign = -1;
+                  }
+              } else if(mode == 1) {
+                  if(*c==' ') {
+                      mode = 2;
+                  }
+              } else if(mode == 2) {
+                  if(*c== ' ' || *c=='+' || *c=='-') {
                       Blade<T> b(s);
+                      b = b*sign;
                       _blades.push_back(b);
-                      if(*c==' ') {
-                          s=c+1;
-                      } else if(*c == 0) {
-                          break;
+                      mode = 0;
+                      if(*c=='-') {
+                          sign = -1;
                       } else {
-                          s = c;
+                          sign = 1;
                       }
-                      basesSearch=false;
-                      pushBlade=false;
-                  }                  
-              } else if(*c == ' ') {
-                  basesSearch=true;
-              } else {
-                  pushBlade = true;
+                  }
               }
               c++;
           }
-          if(pushBlade) {
+          
+          if(mode > 0) {
             Blade<T> b(s);
             _blades.push_back(b);
+            b = b*sign;
           }
           
       }        
