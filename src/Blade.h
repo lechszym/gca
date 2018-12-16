@@ -87,16 +87,19 @@ namespace gca {
 
           const char *c=s;
           bool basesSearch=false;
+          bool baseEntered = false;
           while(*c != 0) {
               if(basesSearch) {
-                  if(*c==' ' || *c=='+' || *c=='-') {
-                      break;
+                  if( (baseEntered and *c==' ') || *c=='+' || *c=='-') {
+                      baseEntered = false;
+                      break;                      
                   } else if(*c=='e') {
                       std::istringstream es(c+1);
                         
                       int e;
                       e = es >> e ? e : 0;
                       _e.push_back(e);
+                      baseEntered = true;
                   }                  
               } else if(*c == ' ') {
                   basesSearch=true;

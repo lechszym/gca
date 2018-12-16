@@ -7,7 +7,7 @@ using namespace gca;
 
 int main(int argc, char **argv) {
 
-#ifndef EIGEN_ENABLED    
+#ifdef EIGEN_ENABLED    
    Eigen::RowVectorXd n(2);
    n << 1, 1;
    Mvec<float> m(n);
@@ -55,10 +55,10 @@ int main(int argc, char **argv) {
    mv2 = mv2/mv;
    cout << mv2 << endl;
 #endif   
-    //Mvec<float> v1("4+2 e1+4  e4^e2^e1-2 e3^e1");
-    Mvec<float> v1("1.2 e1^e2 - 5 e3^e2");
+    //Mvec<float> v1("4 +2 e1 +4 e4^e2^e1 -2 e3^e1");
+    //Mvec<float> v1("1.2 e1^e2 - 5 e3^e2");
     
-    //Mvec<float> v1("1862 e1^e2^e3^e4^e6 +1741 e1^e2^e3^e4^e5 +1187 e1^e2^e3^e5^e6 +2080 e1^e2^e4^e5^e6 -359 e1^e3^e4^e5^e6 +836 e2^e3^e4^e5^e6");
+    Mvec<float> v1("1862 e1^e2^e3^e4^e6 +1741 e1^e2^e3^e4^e5 +1187 e1^e2^e3^e5^e6 +2080 e1^e2^e4^e5^e6 -359 e1^e3^e4^e5^e6 +836 e2^e3^e4^e5^e6");
     //Mvec<float> v2("4 e1 +2 e2 +1 e3 +2 e4 -4 e5 +5 e6");
     //Mvec<float> v2("3.2 e1+4.4 e2-5 e4");
     //Mvec<float> v2("4.4 e2^e3");

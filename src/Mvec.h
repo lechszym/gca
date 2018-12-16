@@ -75,8 +75,32 @@ namespace gca {
               } else if(mode == 1) {
                   if(*c==' ') {
                       mode = 2;
+                  } else if(*c=='+' || *c=='-') {
+                      Blade<T> b(s);
+                      b = b*sign;
+                      _blades.push_back(b);
+                      mode = 0;
+                      if(*c=='-') {
+                          sign = -1;
+                      } else {
+                          sign = 1;
+                      }                      
                   }
               } else if(mode == 2) {
+                  if(*c=='e') {
+                      mode = 3;
+                  } else if(*c=='+' || *c=='-') {
+                      Blade<T> b(s);
+                      b = b*sign;
+                      _blades.push_back(b);
+                      mode = 0;
+                      if(*c=='-') {
+                          sign = -1;
+                      } else {
+                          sign = 1;
+                      }                      
+                  }                  
+              } else if(mode == 3) {
                   if(*c== ' ' || *c=='+' || *c=='-') {
                       Blade<T> b(s);
                       b = b*sign;
@@ -94,8 +118,8 @@ namespace gca {
           
           if(mode > 0) {
             Blade<T> b(s);
-            _blades.push_back(b);
             b = b*sign;
+            _blades.push_back(b);
           }
           
       }        
