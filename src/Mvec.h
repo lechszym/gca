@@ -58,6 +58,42 @@ namespace gca {
 
 #endif      
 
+        Mvec(const char *s) {
+          
+
+          const char *c=s;
+          bool basesSearch=false;
+          bool pushBlade=false;
+          while(*c != 0) {
+              if(basesSearch) {
+                  if(*c==0 || *c==' ' || *c=='+' || *c=='-') {
+                      Blade<T> b(s);
+                      _blades.push_back(b);
+                      if(*c==' ') {
+                          s=c+1;
+                      } else if(*c == 0) {
+                          break;
+                      } else {
+                          s = c;
+                      }
+                      basesSearch=false;
+                      pushBlade=false;
+                  }                  
+              } else if(*c == ' ') {
+                  basesSearch=true;
+              } else {
+                  pushBlade = true;
+              }
+              c++;
+          }
+          if(pushBlade) {
+            Blade<T> b(s);
+            _blades.push_back(b);
+          }
+          
+      }        
+        
+        
         Mvec(const Mvec& orig) {
             _blades = orig._blades;
         }

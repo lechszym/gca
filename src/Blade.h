@@ -89,7 +89,7 @@ namespace gca {
           bool basesSearch=false;
           while(*c != 0) {
               if(basesSearch) {
-                  if(*c==' ') {
+                  if(*c==' ' || *c=='+' || *c=='-') {
                       break;
                   } else if(*c=='e') {
                       std::istringstream es(c+1);
@@ -100,7 +100,9 @@ namespace gca {
                   }                  
               } else if(*c == ' ') {
                   basesSearch=true;
-              } 
+              } else if(*c == '+' || *c=='-') {
+                  break;
+              }
               c++;
           }
           sort_bases();
