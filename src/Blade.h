@@ -90,7 +90,7 @@ namespace gca {
           bool baseEntered = false;
           while(*c != 0) {
               if(basesSearch) {
-                  if( (baseEntered and *c==' ') || *c=='+' || *c=='-') {
+                  if( (baseEntered && (*c==' ' || *c==')')) || *c=='+' || *c=='-') {
                       baseEntered = false;
                       break;                      
                   } else if(*c=='e') {
@@ -101,7 +101,7 @@ namespace gca {
                       _e.push_back(e);
                       baseEntered = true;
                   }                  
-              } else if(*c == ' ') {
+              } else if(*c == ' ' || *c == '(') {
                   basesSearch=true;
               } else if(*c == '+' || *c=='-') {
                   break;
@@ -410,21 +410,31 @@ namespace gca {
 
          ss << _v;
 
-         if (!_e.empty()) {
-            ss << " ";
-         }
+         //if (!_e.empty()) {
+         //   ss << " ";
+         //}
 
 
          ebase_t::const_iterator eA_iter = _e.begin();
 
+         
+         bool bases = false;
          while (eA_iter != _e.end()) {
+            if(!bases) {
+               ss << "(";
+               bases = true;
+            }
+
             ss << "e" << *eA_iter;
             eA_iter++;
             if (eA_iter != _e.end()) {
                ss << "^";
             }
          }
-
+         if(bases) {
+            ss << ")";
+         }
+         
          return ss.str();
       }
 

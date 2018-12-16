@@ -64,6 +64,7 @@ namespace gca {
           const char *c=s;
           int mode=0;
           int sign = 1;
+          bool newBlade = false;
           while(*c != 0) {
               if(mode==0) {
                   if(isdigit(*c)) {
@@ -73,46 +74,34 @@ namespace gca {
                       sign = -1;
                   }
               } else if(mode == 1) {
-                  if(*c==' ') {
+                  if(*c==' ' || *c=='(') {
                       mode = 2;
                   } else if(*c=='+' || *c=='-') {
-                      Blade<T> b(s);
-                      b = b*sign;
-                      _blades.push_back(b);
-                      mode = 0;
-                      if(*c=='-') {
-                          sign = -1;
-                      } else {
-                          sign = 1;
-                      }                      
+                     newBlade = true;
                   }
               } else if(mode == 2) {
                   if(*c=='e') {
                       mode = 3;
-                  } else if(*c=='+' || *c=='-') {
-                      Blade<T> b(s);
-                      b = b*sign;
-                      _blades.push_back(b);
-                      mode = 0;
-                      if(*c=='-') {
-                          sign = -1;
-                      } else {
-                          sign = 1;
-                      }                      
+                  } else if(*c=='+' || *c=='-' || *c==')') {
+                     newBlade = true;
                   }                  
               } else if(mode == 3) {
-                  if(*c== ' ' || *c=='+' || *c=='-') {
-                      Blade<T> b(s);
-                      b = b*sign;
-                      _blades.push_back(b);
-                      mode = 0;
-                      if(*c=='-') {
-                          sign = -1;
-                      } else {
-                          sign = 1;
-                      }
+                  if(*c== ' ' || *c=='+' || *c=='-' || *c==')') {
+                     newBlade = true;
                   }
               }
+              if(newBlade) {
+                 Blade<T> b(s);
+                 b = b*sign;
+                 _blades.push_back(b);
+                 mode = 0;
+                 if(*c=='-') {
+                     sign = -1;
+                 } else {
+                     sign = 1;
+                 }      
+                 newBlade = false;
+              }             
               c++;
           }
           
@@ -363,7 +352,7 @@ namespace gca {
                 std::sort(blades.begin(), blades.end());
                 for (std::size_t i = 0; i < blades.size(); i++) {
                     if (i) {
-                        ss << " ";
+                        //ss << " ";
                         if (blades[i].get() >= 0) {
                             ss << "+";
                         }
