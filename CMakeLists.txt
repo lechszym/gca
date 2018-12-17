@@ -27,6 +27,33 @@ if(OPENMP_FOUND)
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif(OPENMP_FOUND)
 
+
+find_package (Python3 COMPONENTS Interpreter Development)
+
+if(Python3_LIBRARIES)
+    set(Boost_FIND_QUIETLY 1)
+    find_package(Boost COMPONENTS python3)
+    if(NOT Boost_FOUND)
+       find_package(Boost COMPONENTS python36)
+    endif()
+    if(NOT Boost_FOUND)
+       find_package(Boost COMPONENTS python37)
+    endif()
+endif() 
+
+#FIND_PACKAGE(Python3Interp)
+#FIND_PACKAGE(Python3Libs)
+#if(APPLE AND ${PYTHON_VERSION_MAJOR} EQUAL 3)
+#    FIND_PACKAGE(Boost COMPONENTS python3)
+#else()
+#    FIND_PACKAGE(Boost COMPONENTS python)
+#endif()
+
+#ENABLE_TESTING()
+#INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIRS} ${PYTHON_INCLUDE_DIRS})
+#LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so convenient!
+
+
 # add a target to generate API documentation with Doxygen
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
@@ -40,3 +67,8 @@ endif(DOXYGEN_FOUND)
 
 # add the endoscopy src for compile - it has its own cmake config
 add_subdirectory(tests)
+
+if(Boost_FOUND)
+    MESSAGE("-- Found boost-python3")
+    add_subdirectory(python)
+endif() 
