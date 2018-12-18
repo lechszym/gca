@@ -55,7 +55,10 @@ int main(int argc, char **argv) {
    mv2 = mv2/mv;
    cout << mv2 << endl;
 #endif   
-    Mvec<float> v1("4+2(e1)+4(e4^e2^e1)-2(e3^e1)");
+    //Mvec<float> v1("4+2(e1)+4(e4^e2^e1)-2(e3^e1)");
+    Mvec<float> v1("3 + 1.2 e1^e2");
+    Mvec<float> v2("3 - 1.2 e1^e2");
+    
     //Mvec<float> v1("1.2 e1^e2-5 e3^e2");
     
     //Mvec<float> v1("1862 e1^e2^e3^e4^e6 +1741 e1^e2^e3^e4^e5 +1187 e1^e2^e3^e5^e6 +2080 e1^e2^e4^e5^e6 -359 e1^e3^e4^e5^e6 +836 e2^e3^e4^e5^e6");
@@ -64,7 +67,7 @@ int main(int argc, char **argv) {
     //Mvec<float> v2("4.4 e2^e3");
     //Mvec<float> v3;
     
-    cout << "v1=" << v1 << endl;
+    cout << "[" << v1 << "]*[" << v2 << "]=" << (v1*v2) << endl;
     //cout << "v2=" << v2 << endl;
     //v3 = v1^v2;
     //cout << "v3=" << v3 << endl;

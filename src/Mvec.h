@@ -258,7 +258,7 @@ namespace gca {
             Mvec result = (*this) * mInv;
             return result;
         }
-
+        
         Mvec operator/(const T v) const {
             T vf = check_precision_for_zero(v);
             if(vf == 0.0) {

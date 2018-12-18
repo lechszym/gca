@@ -5,9 +5,8 @@ LINK_LIBRARIES(${Boost_LIBRARIES} ${PYTHON_LIBRARIES}) # Deprecated but so conve
 
 include_directories(${gca_SOURCE_DIR}/gca)
 
-#PYTHON_ADD_MODULE(gca gca.cpp)
 Python3_add_library (gca MODULE gca.cpp)
+
 set_property(TARGET gca PROPERTY CXX_STANDARD 11)
-#FILE(COPY cosc343world.py DESTINATION .)
-#FILE(COPY world.py DESTINATION .)
-#FILE(COPY images DESTINATION .)
+
+FILE(COPY test_mvec.py DESTINATION .)
